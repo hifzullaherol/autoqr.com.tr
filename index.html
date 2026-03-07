@@ -1263,10 +1263,11 @@ function mobilPrintQR() { mobPrintQR(); }
 /* ── Bağlantı kopyala ── */
 function mobKopyalaLink() {
   if (!mobAktifKayit) { showNotif('UYARI','Önce bir araç seçin.',true); return; }
-  var link = window.location.origin + (window.location.pathname.replace('index.html','') || '/') + 'musteri.html?id=' + mobAktifKayit.id;
+  var link = mobAktifKayit.qrData;
+  window.open(link, '_blank');
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(link).then(function(){ showNotif('KOPYALANDI','Müşteri bağlantısı kopyalandı.'); });
-  } else { showNotif('BAĞLANTI', link); }
+    navigator.clipboard.writeText(link).then(function(){ showNotif('AÇILDI','Müşteri ekranı yeni pencerede açıldı.'); });
+  } else { showNotif('AÇILDI','Müşteri ekranı yeni pencerede açıldı.'); }
 }
 
 /* ── Geçmiş modal ── */
@@ -2194,10 +2195,11 @@ function downloadQR() {
 
 function copyRegistrationLink() {
   if (!aktifQR) return;
-  var url = 'https://aracqr.com.tr/kayit/' + aktifQR.id;
+  var url = aktifQR.qrData;
+  window.open(url, '_blank');
   navigator.clipboard.writeText(url)
-    .then(function() { showNotif('KOPYALANDI', 'Kayıt bağlantısı kopyalandı.'); })
-    .catch(function() { showNotif('HATA', 'Kopyalama başarısız.', true); });
+    .then(function() { showNotif('AÇILDI', 'Müşteri ekranı yeni pencerede açıldı.'); })
+    .catch(function() { showNotif('AÇILDI', 'Müşteri ekranı yeni pencerede açıldı.'); });
 }
 
 function openModal() {
