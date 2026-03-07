@@ -1167,29 +1167,46 @@ async function loginYap() {
 }
 
 async function cikisYap() {
+  if (mevcutServisId) {
+    try {
+      await sb.from('ziyaretler').delete().eq('servis_id', mevcutServisId);
+      await sb.from('araclar').delete().eq('servis_id', mevcutServisId);
+    } catch(e) { console.warn('Çıkış temizliği hatası:', e); }
+  }
   await sb.auth.signOut();
   kayitlar.length = 0;
+  mevcutServisId = null;
   renderVehicleList();
   loginGoster();
 }
 
-// ── SEKME KAPATILINCA OTOMATİK ÇIKIŞ ──────────────────
-window.addEventListener('beforeunload', function() {
-  // Supabase oturumunu temizle (senkron olarak localStorage'dan sil)
-  try {
-    // Supabase'in localStorage anahtarlarını temizle
-    Object.keys(localStorage).forEach(function(key) {
-      if (key.startsWith('sb-') || key.includes('supabase')) {
-        localStorage.removeItem(key);
-      }
-    });
-    // Araç verilerini de temizle (isteğe bağlı — güvenlik için)
-    localStorage.removeItem('arac_kayitlari');
-  } catch(e) {}
+// ── SEKME KAPATILINCA OTOMATİK ÇIKIŞ + VERİ TEMİZLİĞİ ──
+window.addEventListener('visibilitychange', function() {
+  if (document.visibilityState === 'hidden') {
+    if (mevcutServisId) {
+      sb.auth.getSession().then(function(res) {
+        var session = res.data && res.data.session;
+        if (!session) return;
+        var headers = {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + session.access_token
+        };
+        // keepalive: sayfa kapansa bile istek tamamlanır
+        fetch(SUPABASE_URL + '/rest/v1/ziyaretler?servis_id=eq.' + mevcutServisId, {
+          method: 'DELETE', headers: headers, keepalive: true
+        });
+        fetch(SUPABASE_URL + '/rest/v1/araclar?servis_id=eq.' + mevcutServisId, {
+          method: 'DELETE', headers: headers, keepalive: true
+        });
+      });
+    }
+    sb.auth.signOut();
+  }
 });
 
-// kayitlar: cloud'dan yüklenir, localStorage yedek olarak tutulur
-const kayitlar = JSON.parse(localStorage.getItem('arac_kayitlari')) || [];
+// kayitlar: sadece bellekte tutulur, localStorage kullanılmaz
+const kayitlar = [];
 let   cloudYuklendi = false;
 let   mevcutOncelik = 'low';
 let   aktifQR       = null;
@@ -1211,20 +1228,6 @@ const SERVISLER = [
 
 // ── SAYFA HAZIR ───────────────────────────────────────
 window.onload = function() {
-  // Eski localStorage verisini yeni formata migrate et
-  kayitlar.forEach(function(r, i) {
-    if (!r) return;
-    if (!r.visits)   r.visits   = [];
-    if (!r.services) r.services = [];
-    if (!r.id)       r.id       = 'AQR-' + i;
-    if (!r.plate)    r.plate    = '?';
-    if (!r.owner)    r.owner    = '';
-    if (!r.year)     r.year     = '';
-    if (!r.make)     r.make     = '';
-    if (!r.model)    r.model    = '';
-    if (!r.timestamp && r.visits && r.visits[0]) r.timestamp = r.visits[0].timestamp;
-  });
-
   // Yıl dropdown doldur
   var sel = document.getElementById('year');
   for (var y = new Date().getFullYear(); y >= 1980; y--) {
@@ -1308,13 +1311,12 @@ async function cloudYukle() {
       kayitlar.push(reg);
     });
 
-    localStorage.setItem('arac_kayitlari', JSON.stringify(kayitlar));
     cloudYuklendi = true;
     renderVehicleList();
     showNotif('BAĞLANDI', 'Cloud veriler yüklendi (' + kayitlar.length + ' araç).');
   } catch(err) {
-    console.warn('Cloud yüklenemedi, offline çalışılıyor:', err.message);
-    showNotif('OFFLİNE', 'Cloud bağlantısı yok, yerel veriler kullanılıyor.', true);
+    console.warn('Cloud yüklenemedi:', err.message);
+    showNotif('HATA', 'Cloud bağlantısı kurulamadı.', true);
   } finally {
     showYukleniyor(false);
   }
@@ -1519,7 +1521,6 @@ function generateRegistration() {
       }, 0).toString(36).replace('-','').toUpperCase().slice(-6);
       kayitlar[idx].id     = sabitId;
       kayitlar[idx].qrData = 'https://autoqr.com.tr/musteri.html?id=' + sabitId;
-      localStorage.setItem('arac_kayitlari', JSON.stringify(kayitlar));
       aktifAracId = duzenlenenId;
       renderQRCode(kayitlar[idx]);
       renderVehicleList();
@@ -1594,7 +1595,6 @@ function generateRegistration() {
     aktifAracId = regId;
   }
 
-  localStorage.setItem('arac_kayitlari', JSON.stringify(kayitlar));
   cloudKaydet(mevcutIdx !== -1 ? kayitlar[0] : reg, yeniZiyaret);
 
   // mevcutIdx varsa mevcut kaydı, yoksa yeni reg'i kullan
@@ -1727,7 +1727,6 @@ function deleteVehicle(id) {
     if (idx === -1) return;
     var plate = kayitlar[idx].plate;
     kayitlar.splice(idx, 1);
-    localStorage.setItem('arac_kayitlari', JSON.stringify(kayitlar));
     cloudAracSil(id);
     if (aktifAracId === id) {
       aktifAracId = null;
@@ -1818,7 +1817,6 @@ function temizleTumKuyruk() {
 
     showYukleniyor(false);
     kayitlar.length = 0;
-    localStorage.removeItem('arac_kayitlari');
     aktifAracId = null;
     aktifQR     = null;
     document.getElementById('qrcode').innerHTML = '';
@@ -2079,7 +2077,6 @@ function saveVisitEdit() {
   reg.visits[vIdx].services     = selectedServices;
   reg.visits[vIdx].urgency      = urgency;
 
-  localStorage.setItem('arac_kayitlari', JSON.stringify(kayitlar));
   cloudZiyaretGuncelle(visitId, reg.visits[vIdx]);
   document.getElementById('edit-visit-modal').style.display = 'none';
   openHistoryModal(regId);
@@ -2157,7 +2154,6 @@ function deleteVisit(regId, visitId) {
   if (!reg) return;
   if (!reg.visits) reg.visits = [];
   reg.visits = reg.visits.filter(function(v) { return v.visitId !== visitId; });
-  localStorage.setItem('arac_kayitlari', JSON.stringify(kayitlar));
   cloudZiyaretSil(visitId);
   openHistoryModal(regId);
   renderVehicleList();
