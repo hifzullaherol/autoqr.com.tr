@@ -1173,6 +1173,21 @@ async function cikisYap() {
   loginGoster();
 }
 
+// ── SEKME KAPATILINCA OTOMATİK ÇIKIŞ ──────────────────
+window.addEventListener('beforeunload', function() {
+  // Supabase oturumunu temizle (senkron olarak localStorage'dan sil)
+  try {
+    // Supabase'in localStorage anahtarlarını temizle
+    Object.keys(localStorage).forEach(function(key) {
+      if (key.startsWith('sb-') || key.includes('supabase')) {
+        localStorage.removeItem(key);
+      }
+    });
+    // Araç verilerini de temizle (isteğe bağlı — güvenlik için)
+    localStorage.removeItem('arac_kayitlari');
+  } catch(e) {}
+});
+
 // kayitlar: cloud'dan yüklenir, localStorage yedek olarak tutulur
 const kayitlar = JSON.parse(localStorage.getItem('arac_kayitlari')) || [];
 let   cloudYuklendi = false;
