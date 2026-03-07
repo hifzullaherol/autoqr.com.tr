@@ -1167,45 +1167,18 @@ async function loginYap() {
 }
 
 async function cikisYap() {
-  if (mevcutServisId) {
-    try {
-      await sb.from('ziyaretler').delete().eq('servis_id', mevcutServisId);
-      await sb.from('araclar').delete().eq('servis_id', mevcutServisId);
-    } catch(e) { console.warn('Çıkış temizliği hatası:', e); }
-  }
   await sb.auth.signOut();
   kayitlar.length = 0;
-  mevcutServisId = null;
   renderVehicleList();
   loginGoster();
 }
 
-// ── SEKME KAPATILINCA OTOMATİK ÇIKIŞ + VERİ TEMİZLİĞİ ──
-window.addEventListener('visibilitychange', function() {
-  if (document.visibilityState === 'hidden') {
-    if (mevcutServisId) {
-      sb.auth.getSession().then(function(res) {
-        var session = res.data && res.data.session;
-        if (!session) return;
-        var headers = {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': 'Bearer ' + session.access_token
-        };
-        // keepalive: sayfa kapansa bile istek tamamlanır
-        fetch(SUPABASE_URL + '/rest/v1/ziyaretler?servis_id=eq.' + mevcutServisId, {
-          method: 'DELETE', headers: headers, keepalive: true
-        });
-        fetch(SUPABASE_URL + '/rest/v1/araclar?servis_id=eq.' + mevcutServisId, {
-          method: 'DELETE', headers: headers, keepalive: true
-        });
-      });
-    }
-    sb.auth.signOut();
-  }
+// ── SEKME KAPATILINCA OTOMATİK ÇIKIŞ ──────────────────
+window.addEventListener('beforeunload', function() {
+  try { sb.auth.signOut(); } catch(e) {}
 });
 
-// kayitlar: sadece bellekte tutulur, localStorage kullanılmaz
+// kayitlar: cloud'dan yüklenir
 const kayitlar = [];
 let   cloudYuklendi = false;
 let   mevcutOncelik = 'low';
@@ -1315,7 +1288,7 @@ async function cloudYukle() {
     renderVehicleList();
     showNotif('BAĞLANDI', 'Cloud veriler yüklendi (' + kayitlar.length + ' araç).');
   } catch(err) {
-    console.warn('Cloud yüklenemedi:', err.message);
+    console.warn('Cloud yüklenemedi, offline çalışılıyor:', err.message);
     showNotif('HATA', 'Cloud bağlantısı kurulamadı.', true);
   } finally {
     showYukleniyor(false);
