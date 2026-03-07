@@ -6,7 +6,7 @@
 <title>AutoQR — Oto Servis Kayıt Sistemi</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;900&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --bg: #0a0c0f;
@@ -877,7 +877,7 @@
 // ── STATE ─────────────────────────────────────────────
 // ── SUPABASE ─────────────────────────────────────────
 const SUPABASE_URL = 'https://kbaoqhkruwiibjjagmlh.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiYW9xaGtydXdpaWJqamFnbWxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzNjg2NzIsImV4cCI6MjA4Nzk0NDY3Mn0.5Qtiv4T9kw3XaW8uZxZst5jv7gt9Sw5bfF-mkWttJ6M';
+const SUPABASE_KEY = 'sb_publishable_HRU1T2X3iFZjAD4dITjQQw_uPPZKZTt';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ══════════════════════════════════════════════════════
@@ -1173,13 +1173,8 @@ async function cikisYap() {
   loginGoster();
 }
 
-// ── SEKME KAPATILINCA OTOMATİK ÇIKIŞ ──────────────────
-window.addEventListener('beforeunload', function() {
-  try { sb.auth.signOut(); } catch(e) {}
-});
-
-// kayitlar: cloud'dan yüklenir
-const kayitlar = [];
+// kayitlar: cloud'dan yüklenir, localStorage yedek olarak tutulur
+const kayitlar = JSON.parse(localStorage.getItem('arac_kayitlari')) || [];
 let   cloudYuklendi = false;
 let   mevcutOncelik = 'low';
 let   aktifQR       = null;
@@ -1201,6 +1196,20 @@ const SERVISLER = [
 
 // ── SAYFA HAZIR ───────────────────────────────────────
 window.onload = function() {
+  // Eski localStorage verisini yeni formata migrate et
+  kayitlar.forEach(function(r, i) {
+    if (!r) return;
+    if (!r.visits)   r.visits   = [];
+    if (!r.services) r.services = [];
+    if (!r.id)       r.id       = 'AQR-' + i;
+    if (!r.plate)    r.plate    = '?';
+    if (!r.owner)    r.owner    = '';
+    if (!r.year)     r.year     = '';
+    if (!r.make)     r.make     = '';
+    if (!r.model)    r.model    = '';
+    if (!r.timestamp && r.visits && r.visits[0]) r.timestamp = r.visits[0].timestamp;
+  });
+
   // Yıl dropdown doldur
   var sel = document.getElementById('year');
   for (var y = new Date().getFullYear(); y >= 1980; y--) {
@@ -1284,12 +1293,13 @@ async function cloudYukle() {
       kayitlar.push(reg);
     });
 
+    localStorage.setItem('arac_kayitlari', JSON.stringify(kayitlar));
     cloudYuklendi = true;
     renderVehicleList();
     showNotif('BAĞLANDI', 'Cloud veriler yüklendi (' + kayitlar.length + ' araç).');
   } catch(err) {
     console.warn('Cloud yüklenemedi, offline çalışılıyor:', err.message);
-    showNotif('HATA', 'Cloud bağlantısı kurulamadı.', true);
+    showNotif('OFFLİNE', 'Cloud bağlantısı yok, yerel veriler kullanılıyor.', true);
   } finally {
     showYukleniyor(false);
   }
@@ -1445,7 +1455,7 @@ function updatePreview() {
 }
 
 // ── KAYIT OLUŞTUR ─────────────────────────────────────
-async function generateRegistration() {
+function generateRegistration() {
   // Servis kontrolü
   if (seciliServisler.size === 0) {
     showNotif('SERVİS SEÇİN', 'En az bir servis seçilmelidir.', true);
@@ -1494,8 +1504,8 @@ async function generateRegistration() {
       }, 0).toString(36).replace('-','').toUpperCase().slice(-6);
       kayitlar[idx].id     = sabitId;
       kayitlar[idx].qrData = 'https://autoqr.com.tr/musteri.html?id=' + sabitId;
+      localStorage.setItem('arac_kayitlari', JSON.stringify(kayitlar));
       aktifAracId = duzenlenenId;
-      await cloudKaydet(kayitlar[idx], null);
       renderQRCode(kayitlar[idx]);
       renderVehicleList();
       showNotif('GÜNCELLENDİ', plate + ' bilgileri güncellendi.');
@@ -1569,7 +1579,8 @@ async function generateRegistration() {
     aktifAracId = regId;
   }
 
-  await cloudKaydet(mevcutIdx !== -1 ? kayitlar[0] : reg, yeniZiyaret);
+  localStorage.setItem('arac_kayitlari', JSON.stringify(kayitlar));
+  cloudKaydet(mevcutIdx !== -1 ? kayitlar[0] : reg, yeniZiyaret);
 
   // mevcutIdx varsa mevcut kaydı, yoksa yeni reg'i kullan
   var aktifKayit = mevcutIdx !== -1 ? kayitlar[0] : reg;
@@ -1701,6 +1712,7 @@ function deleteVehicle(id) {
     if (idx === -1) return;
     var plate = kayitlar[idx].plate;
     kayitlar.splice(idx, 1);
+    localStorage.setItem('arac_kayitlari', JSON.stringify(kayitlar));
     cloudAracSil(id);
     if (aktifAracId === id) {
       aktifAracId = null;
@@ -1765,32 +1777,9 @@ function editVehicle(id) {
 // ── TÜMÜNÜ SİL ────────────────────────────────────────
 function temizleTumKuyruk() {
   if (kayitlar.length === 0) return;
-  showConfirm('Tüm kayıtları silmek istediğinize emin misiniz? Bu işlem geri alınamaz!', async function() {
-    showYukleniyor(true);
-
-    // Supabase'den sil — önce ziyaretler, sonra araçlar
-    if (mevcutServisId) {
-      var { error: zErr } = await sb.from('ziyaretler').delete().eq('servis_id', mevcutServisId);
-      if (zErr) {
-        showYukleniyor(false);
-        showNotif('HATA', 'Ziyaretler silinemedi: ' + zErr.message, true);
-        console.error('Ziyaret silme hatası:', zErr);
-        return;
-      }
-      var { error: aErr } = await sb.from('araclar').delete().eq('servis_id', mevcutServisId);
-      if (aErr) {
-        showYukleniyor(false);
-        showNotif('HATA', 'Araçlar silinemedi: ' + aErr.message, true);
-        console.error('Araç silme hatası:', aErr);
-        return;
-      }
-      // servis_id NULL olan eski kayıtları da sil
-      await sb.from('ziyaretler').delete().is('servis_id', null);
-      await sb.from('araclar').delete().is('servis_id', null);
-    }
-
-    showYukleniyor(false);
+  showConfirm('Tüm kayıtları silmek istediğinize emin misiniz?', function() {
     kayitlar.length = 0;
+    localStorage.removeItem('arac_kayitlari');
     aktifAracId = null;
     aktifQR     = null;
     document.getElementById('qrcode').innerHTML = '';
@@ -1799,7 +1788,7 @@ function temizleTumKuyruk() {
     document.getElementById('qr-info').style.display    = 'none';
     document.getElementById('qr-actions').style.display = 'none';
     renderVehicleList();
-    showNotif('SİSTEM', 'Tüm kayıtlar silindi.', true);
+    showNotif('SİSTEM', 'Tüm kayıtlar temizlendi.', true);
   });
 }
 
@@ -2051,6 +2040,7 @@ function saveVisitEdit() {
   reg.visits[vIdx].services     = selectedServices;
   reg.visits[vIdx].urgency      = urgency;
 
+  localStorage.setItem('arac_kayitlari', JSON.stringify(kayitlar));
   cloudZiyaretGuncelle(visitId, reg.visits[vIdx]);
   document.getElementById('edit-visit-modal').style.display = 'none';
   openHistoryModal(regId);
@@ -2059,72 +2049,59 @@ function saveVisitEdit() {
 }
 
 async function cloudKaydet(reg, ziyaret) {
-  if (!reg) return false;
-  // mevcutServisId henüz yüklenmemişse max 3 saniye bekle
-  if (!mevcutServisId) {
-    var bekle = 0;
-    while (!mevcutServisId && bekle < 30) {
-      await new Promise(function(r){ setTimeout(r, 100); });
-      bekle++;
-    }
-    if (!mevcutServisId) {
-      showNotif('HATA', 'Servis kimliği alınamadı. Lütfen tekrar giriş yapın.', true);
-      return false;
-    }
-  }
-  // Aracı upsert et
-  var { error: aracErr } = await sb.from('araclar').upsert({
-    id: reg.id, plate: reg.plate, year: reg.year, make: reg.make,
-    model: reg.model, color: reg.color, owner: reg.owner,
-    phone: reg.phone, email: reg.email, qr_data: reg.qrData,
-    servis_id: mevcutServisId,
-    updated_at: new Date().toISOString()
-  });
-  if (aracErr) {
-    console.error('Arac kayit hatasi:', aracErr);
-    showNotif('KAYIT HATASI', 'Arac kaydedilemedi: ' + aracErr.message, true);
-    return false;
-  }
-  // Ziyareti ekle
-  if (ziyaret) {
-    var { error: ziyErr } = await sb.from('ziyaretler').upsert({
-      id: ziyaret.visitId, arac_id: reg.id,
-      services: ziyaret.services, urgency: ziyaret.urgency,
-      mileage: ziyaret.mileage, dropoff: ziyaret.dropoff,
-      pickup: ziyaret.pickup, owner_notes: ziyaret.ownerNotes,
-      service_notes: ziyaret.serviceNotes, timestamp: ziyaret.timestamp,
-      servis_id: mevcutServisId
+  if (!reg) return;
+  try {
+    // Aracı upsert et
+    await sb.from('araclar').upsert({
+      id: reg.id, plate: reg.plate, year: reg.year, make: reg.make,
+      model: reg.model, color: reg.color, owner: reg.owner,
+      phone: reg.phone, email: reg.email, qr_data: reg.qrData,
+      servis_id: mevcutServisId,
+      updated_at: new Date().toISOString()
     });
-    if (ziyErr) {
-      console.error('Ziyaret kayit hatasi:', ziyErr);
-      showNotif('KAYIT HATASI', 'Ziyaret kaydedilemedi: ' + ziyErr.message, true);
-      return false;
+    // Ziyareti ekle
+    if (ziyaret) {
+      await sb.from('ziyaretler').upsert({
+        id: ziyaret.visitId, arac_id: reg.id,
+        services: ziyaret.services, urgency: ziyaret.urgency,
+        mileage: ziyaret.mileage, dropoff: ziyaret.dropoff,
+        pickup: ziyaret.pickup, owner_notes: ziyaret.ownerNotes,
+        service_notes: ziyaret.serviceNotes, timestamp: ziyaret.timestamp,
+        servis_id: mevcutServisId
+      });
     }
+  } catch(err) {
+    console.warn('Cloud kayıt hatası:', err.message);
   }
-  return true;
 }
 
 async function cloudZiyaretGuncelle(visitId, data) {
-  var { error } = await sb.from('ziyaretler').update({
-    services: data.services, urgency: data.urgency,
-    mileage: data.mileage, dropoff: data.dropoff,
-    pickup: data.pickup, owner_notes: data.ownerNotes,
-    service_notes: data.serviceNotes
-  }).eq('id', visitId);
-  if (error) {
-    console.error('Ziyaret guncelleme hatasi:', error);
-    showNotif('HATA', 'Ziyaret guncellenemedi: ' + error.message, true);
+  try {
+    await sb.from('ziyaretler').update({
+      services: data.services, urgency: data.urgency,
+      mileage: data.mileage, dropoff: data.dropoff,
+      pickup: data.pickup, owner_notes: data.ownerNotes,
+      service_notes: data.serviceNotes
+    }).eq('id', visitId);
+  } catch(err) {
+    console.warn('Cloud güncelleme hatası:', err.message);
   }
 }
 
 async function cloudZiyaretSil(visitId) {
-  var { error } = await sb.from('ziyaretler').delete().eq('id', visitId);
-  if (error) showNotif('HATA', 'Ziyaret silinemedi: ' + error.message, true);
+  try {
+    await sb.from('ziyaretler').delete().eq('id', visitId);
+  } catch(err) {
+    console.warn('Cloud silme hatası:', err.message);
+  }
 }
 
 async function cloudAracSil(regId) {
-  var { error } = await sb.from('araclar').delete().eq('id', regId);
-  if (error) showNotif('HATA', 'Arac silinemedi: ' + error.message, true);
+  try {
+    await sb.from('araclar').delete().eq('id', regId);
+  } catch(err) {
+    console.warn('Cloud araç silme hatası:', err.message);
+  }
 }
 
 function deleteVisit(regId, visitId) {
@@ -2132,6 +2109,7 @@ function deleteVisit(regId, visitId) {
   if (!reg) return;
   if (!reg.visits) reg.visits = [];
   reg.visits = reg.visits.filter(function(v) { return v.visitId !== visitId; });
+  localStorage.setItem('arac_kayitlari', JSON.stringify(kayitlar));
   cloudZiyaretSil(visitId);
   openHistoryModal(regId);
   renderVehicleList();
