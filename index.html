@@ -1445,7 +1445,7 @@ function updatePreview() {
 }
 
 // ── KAYIT OLUŞTUR ─────────────────────────────────────
-function generateRegistration() {
+async function generateRegistration() {
   // Servis kontrolü
   if (seciliServisler.size === 0) {
     showNotif('SERVİS SEÇİN', 'En az bir servis seçilmelidir.', true);
@@ -1495,6 +1495,7 @@ function generateRegistration() {
       kayitlar[idx].id     = sabitId;
       kayitlar[idx].qrData = 'https://autoqr.com.tr/musteri.html?id=' + sabitId;
       aktifAracId = duzenlenenId;
+      await cloudKaydet(kayitlar[idx], null);
       renderQRCode(kayitlar[idx]);
       renderVehicleList();
       showNotif('GÜNCELLENDİ', plate + ' bilgileri güncellendi.');
@@ -1568,7 +1569,7 @@ function generateRegistration() {
     aktifAracId = regId;
   }
 
-  cloudKaydet(mevcutIdx !== -1 ? kayitlar[0] : reg, yeniZiyaret);
+  await cloudKaydet(mevcutIdx !== -1 ? kayitlar[0] : reg, yeniZiyaret);
 
   // mevcutIdx varsa mevcut kaydı, yoksa yeni reg'i kullan
   var aktifKayit = mevcutIdx !== -1 ? kayitlar[0] : reg;
@@ -2058,7 +2059,7 @@ function saveVisitEdit() {
 }
 
 async function cloudKaydet(reg, ziyaret) {
-  if (!reg) return;
+  if (!reg) return false;
   // mevcutServisId henüz yüklenmemişse max 3 saniye bekle
   if (!mevcutServisId) {
     var bekle = 0;
@@ -2066,60 +2067,64 @@ async function cloudKaydet(reg, ziyaret) {
       await new Promise(function(r){ setTimeout(r, 100); });
       bekle++;
     }
-    if (!mevcutServisId) { console.warn("cloudKaydet: mevcutServisId alınamadı, atlandı."); return; }
-  }
-  try {
-    // Aracı upsert et
-    await sb.from('araclar').upsert({
-      id: reg.id, plate: reg.plate, year: reg.year, make: reg.make,
-      model: reg.model, color: reg.color, owner: reg.owner,
-      phone: reg.phone, email: reg.email, qr_data: reg.qrData,
-      servis_id: mevcutServisId,
-      updated_at: new Date().toISOString()
-    });
-    // Ziyareti ekle
-    if (ziyaret) {
-      await sb.from('ziyaretler').upsert({
-        id: ziyaret.visitId, arac_id: reg.id,
-        services: ziyaret.services, urgency: ziyaret.urgency,
-        mileage: ziyaret.mileage, dropoff: ziyaret.dropoff,
-        pickup: ziyaret.pickup, owner_notes: ziyaret.ownerNotes,
-        service_notes: ziyaret.serviceNotes, timestamp: ziyaret.timestamp,
-        servis_id: mevcutServisId
-      });
+    if (!mevcutServisId) {
+      showNotif('HATA', 'Servis kimliği alınamadı. Lütfen tekrar giriş yapın.', true);
+      return false;
     }
-  } catch(err) {
-    console.warn('Cloud kayıt hatası:', err.message);
   }
+  // Aracı upsert et
+  var { error: aracErr } = await sb.from('araclar').upsert({
+    id: reg.id, plate: reg.plate, year: reg.year, make: reg.make,
+    model: reg.model, color: reg.color, owner: reg.owner,
+    phone: reg.phone, email: reg.email, qr_data: reg.qrData,
+    servis_id: mevcutServisId,
+    updated_at: new Date().toISOString()
+  });
+  if (aracErr) {
+    console.error('Arac kayit hatasi:', aracErr);
+    showNotif('KAYIT HATASI', 'Arac kaydedilemedi: ' + aracErr.message, true);
+    return false;
+  }
+  // Ziyareti ekle
+  if (ziyaret) {
+    var { error: ziyErr } = await sb.from('ziyaretler').upsert({
+      id: ziyaret.visitId, arac_id: reg.id,
+      services: ziyaret.services, urgency: ziyaret.urgency,
+      mileage: ziyaret.mileage, dropoff: ziyaret.dropoff,
+      pickup: ziyaret.pickup, owner_notes: ziyaret.ownerNotes,
+      service_notes: ziyaret.serviceNotes, timestamp: ziyaret.timestamp,
+      servis_id: mevcutServisId
+    });
+    if (ziyErr) {
+      console.error('Ziyaret kayit hatasi:', ziyErr);
+      showNotif('KAYIT HATASI', 'Ziyaret kaydedilemedi: ' + ziyErr.message, true);
+      return false;
+    }
+  }
+  return true;
 }
 
 async function cloudZiyaretGuncelle(visitId, data) {
-  try {
-    await sb.from('ziyaretler').update({
-      services: data.services, urgency: data.urgency,
-      mileage: data.mileage, dropoff: data.dropoff,
-      pickup: data.pickup, owner_notes: data.ownerNotes,
-      service_notes: data.serviceNotes
-    }).eq('id', visitId);
-  } catch(err) {
-    console.warn('Cloud güncelleme hatası:', err.message);
+  var { error } = await sb.from('ziyaretler').update({
+    services: data.services, urgency: data.urgency,
+    mileage: data.mileage, dropoff: data.dropoff,
+    pickup: data.pickup, owner_notes: data.ownerNotes,
+    service_notes: data.serviceNotes
+  }).eq('id', visitId);
+  if (error) {
+    console.error('Ziyaret guncelleme hatasi:', error);
+    showNotif('HATA', 'Ziyaret guncellenemedi: ' + error.message, true);
   }
 }
 
 async function cloudZiyaretSil(visitId) {
-  try {
-    await sb.from('ziyaretler').delete().eq('id', visitId);
-  } catch(err) {
-    console.warn('Cloud silme hatası:', err.message);
-  }
+  var { error } = await sb.from('ziyaretler').delete().eq('id', visitId);
+  if (error) showNotif('HATA', 'Ziyaret silinemedi: ' + error.message, true);
 }
 
 async function cloudAracSil(regId) {
-  try {
-    await sb.from('araclar').delete().eq('id', regId);
-  } catch(err) {
-    console.warn('Cloud araç silme hatası:', err.message);
-  }
+  var { error } = await sb.from('araclar').delete().eq('id', regId);
+  if (error) showNotif('HATA', 'Arac silinemedi: ' + error.message, true);
 }
 
 function deleteVisit(regId, visitId) {
