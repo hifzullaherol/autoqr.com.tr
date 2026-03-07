@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AutoQR — Servis Geçmişi</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+<style>
+  :root {
+    --bg:       #0a0c0f;
+    --surface:  #12151a;
+    --surface2: #1a1e26;
+    --border:   #252a35;
+    --accent:   #e8ff47;
+    --accent2:  #ff6b35;
+    --text:     #e8eaf0;
+    --text-dim: #6b7280;
+    --text-muted: #3d4455;
+    --success:  #22c55e;
+    --warning:  #f59e0b;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(232,255,71,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,255,71,0.02) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events:none; z-index:0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position:relative; z-index:10;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px;
+    border-bottom:1px solid var(--border);
+    background:rgba(10,12,15,0.95);
+    backdrop-filter:blur(10px);
+  }
+
+  .logo { display:flex; align-items:center; gap:10px; }
+  .logo-icon {
+    width:30px; height:30px;
+    background:var(--accent);
+    display:grid; grid-template-columns:1fr 1fr 1fr;
+    gap:2px; padding:4px; border-radius:3px;
+  }
+  .logo-icon span { background:var(--bg); border-radius:1px; }
+  .logo-icon span:nth-child(3),
+  .logo-icon span:nth-child(5),
+  .logo-icon span:nth-child(7) { background:transparent; }
+  .logo-text {
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:18px; font-weight:900; letter-spacing:2px; text-transform:uppercase;
+  }
+  .logo-text span { color:var(--accent); }
+
+  /* ── MAIN ── */
+  main {
+    position:relative; z-index:1;
+    max-width:520px; margin:0 auto;
+    padding:28px 20px 60px;
+  }
+
+  /* ── LOADING ── */
+  .loading-box {
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:80px 20px; gap:16px;
+  }
+  .spinner {
+    width:36px; height:36px;
+    border:3px solid var(--border);
+    border-top-color:var(--accent);
+    border-radius:50%;
+    animation:spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  /* ── HATA ── */
+  .error-box {
+    display:none;
+    text-align:center; padding:60px 20px;
+  }
+  .error-icon { font-size:48px; margin-bottom:16px; }
+  .error-title {
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:24px; font-weight:700; color:var(--accent2);
+    letter-spacing:2px; margin-bottom:8px;
+  }
+  .error-msg { font-size:12px; color:var(--text-dim); line-height:1.6; }
+
+  /* ── ARAÇ KART ── */
+  .arac-card {
+    display:none;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:12px;
+    overflow:hidden;
+    margin-bottom:24px;
+    animation:fadeUp 0.4s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  .arac-header {
+    padding:20px 24px;
+    background:linear-gradient(135deg, rgba(232,255,71,0.06), transparent);
+    border-bottom:1px solid var(--border);
+  }
+
+  .plaka {
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:42px; font-weight:900;
+    letter-spacing:6px; color:var(--accent);
+    line-height:1;
+  }
+
+  .arac-bilgi {
+    font-size:13px; color:var(--text-dim);
+    margin-top:6px; letter-spacing:1px;
+  }
+
+  .arac-meta {
+    display:flex; gap:16px;
+    padding:14px 24px;
+    background:var(--surface2);
+  }
+
+  .meta-item { display:flex; flex-direction:column; gap:3px; }
+  .meta-label { font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; }
+  .meta-value { font-size:12px; color:var(--text); }
+
+  /* ── ZİYARETLER ── */
+  .section-title {
+    font-size:9px; letter-spacing:3px; text-transform:uppercase;
+    color:var(--text-muted); margin-bottom:12px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  .visit-card {
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:16px;
+    margin-bottom:10px;
+    animation:fadeUp 0.3s ease both;
+  }
+
+  .visit-header {
+    display:flex; justify-content:space-between;
+    align-items:center; margin-bottom:10px;
+  }
+
+  .visit-date { font-size:10px; color:var(--text-dim); letter-spacing:1px; }
+
+  .badge {
+    font-size:9px; padding:2px 10px;
+    border-radius:10px; letter-spacing:1px;
+    font-weight:600; text-transform:uppercase;
+  }
+  .badge-low  { border:1px solid var(--success); color:var(--success); }
+  .badge-med  { border:1px solid var(--warning); color:var(--warning); }
+  .badge-high { border:1px solid var(--accent2); color:var(--accent2); }
+
+  .visit-services {
+    display:flex; flex-wrap:wrap; gap:6px;
+    margin-bottom:10px;
+  }
+  .servis-tag {
+    font-size:10px; padding:3px 10px;
+    background:rgba(232,255,71,0.06);
+    border:1px solid rgba(232,255,71,0.15);
+    border-radius:20px; color:var(--accent);
+    letter-spacing:0.5px;
+  }
+
+  .visit-details {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:8px; margin-top:10px;
+    padding-top:10px; border-top:1px solid var(--border);
+  }
+  .detail-item { display:flex; flex-direction:column; gap:2px; }
+  .detail-label { font-size:8px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; }
+  .detail-value { font-size:11px; color:var(--text-dim); }
+
+  .visit-note {
+    margin-top:10px; padding:10px;
+    background:var(--surface2);
+    border-radius:4px;
+    font-size:11px; color:var(--text-dim);
+    font-style:italic; line-height:1.5;
+    border-left:2px solid var(--border);
+  }
+
+  /* ── BOŞ ── */
+  .empty-visits {
+    text-align:center; padding:32px;
+    color:var(--text-muted); font-size:11px; letter-spacing:1px;
+  }
+
+  /* ── FOOTER ── */
+  .powered {
+    text-align:center; margin-top:32px;
+    font-size:10px; color:var(--text-muted); letter-spacing:2px;
+  }
+  .powered span { color:var(--accent); }
+
+  /* ── KAMERA ── */
+  .scanner-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+    animation: fadeUp 0.4s ease;
+  }
+  .scanner-header {
+    padding: 14px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .scanner-label {
+    font-size: 10px; letter-spacing: 3px;
+    color: var(--text-muted); text-transform: uppercase;
+  }
+  .scanner-status {
+    font-size: 10px; letter-spacing: 1px;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--text-muted);
+  }
+  .status-dot.active { background: var(--accent); animation: pulse 1.2s ease infinite; }
+  .status-dot.found  { background: var(--success); }
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+  }
+  .video-wrap {
+    position: relative;
+    background: #000;
+    aspect-ratio: 4/3;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #qr-video {
+    width: 100%; height: 100%;
+    object-fit: cover; display: block;
+  }
+  .scan-overlay {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    pointer-events: none;
+  }
+  .scan-frame {
+    width: 200px; height: 200px;
+    position: relative;
+  }
+  .scan-frame::before, .scan-frame::after,
+  .scan-frame span::before, .scan-frame span::after {
+    content: ''; position: absolute;
+    width: 28px; height: 28px;
+    border-color: var(--accent); border-style: solid;
+  }
+  .scan-frame::before  { top:0;    left:0;  border-width:3px 0 0 3px; }
+  .scan-frame::after   { top:0;    right:0; border-width:3px 3px 0 0; }
+  .scan-frame span::before { bottom:0; left:0;  border-width:0 0 3px 3px; }
+  .scan-frame span::after  { bottom:0; right:0; border-width:0 3px 3px 0; }
+  .scan-line {
+    position: absolute; left: 10%; right: 10%; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    animation: scanLine 2s ease-in-out infinite;
+    top: 50%;
+  }
+  @keyframes scanLine {
+    0%   { top: 15%; opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 1; }
+    100% { top: 85%; opacity: 0; }
+  }
+  .scanner-tip {
+    padding: 12px 20px;
+    font-size: 10px; color: var(--text-muted);
+    text-align: center; letter-spacing: 1px;
+    border-top: 1px solid var(--border);
+  }
+  .btn-kamera {
+    width: 100%; padding: 14px;
+    background: var(--accent); border: none; color: var(--bg);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 16px; font-weight: 700; letter-spacing: 3px;
+    cursor: pointer; border-radius: 8px; text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .btn-kamera:hover { background: #d4eb3a; }
+  .btn-tekrar {
+    width: 100%; padding: 12px;
+    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 2px;
+    cursor: pointer; border-radius: 8px;
+    margin-top: 12px; text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+      <span></span><span></span><span></span>
+    </div>
+    <div class="logo-text">Auto<span>QR</span></div>
+  </div>
+  <div style="font-size:10px; color:var(--text-muted); letter-spacing:1px;">SERVİS GEÇMİŞİ</div>
+</header>
+
+<main>
+
+  <!-- Kamera Tarayıcı -->
+  <div class="scanner-box" id="scanner-box">
+    <div class="scanner-header">
+      <div class="scanner-label">QR KOD TARA</div>
+      <div class="scanner-status">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text" style="color:var(--text-muted);">HAZIR DEĞİL</span>
+      </div>
+    </div>
+    <div class="video-wrap" id="video-wrap">
+      <video id="qr-video" playsinline autoplay muted></video>
+      <div class="scan-overlay">
+        <div class="scan-frame">
+          <span></span>
+          <div class="scan-line"></div>
+        </div>
+      </div>
+    </div>
+    <div class="scanner-tip">📱 QR kodu çerçeveye hizalayın</div>
+  </div>
+
+  <!-- Manuel başlatma (izin verilmezse) -->
+  <div id="kamera-baslat-wrap" style="display:none;">
+    <button class="btn-kamera" onclick="kameraBaslat()">📷 KAMERAY BAŞLAT</button>
+  </div>
+
+  <!-- Yükleniyor -->
+  <div class="loading-box" id="loading" style="display:none;">
+    <div class="spinner"></div>
+    <div style="font-size:11px; color:var(--text-muted); letter-spacing:2px;">YÜKLENIYOR</div>
+  </div>
+
+  <!-- Hata -->
+  <div class="error-box" id="error-box">
+    <div class="error-icon">🔍</div>
+    <div class="error-title" id="error-title">KAYIT BULUNAMADI</div>
+    <div class="error-msg" id="error-msg">Bu QR koda ait servis kaydı bulunamadı.<br>Lütfen servis personeliyle iletişime geçin.</div>
+  </div>
+
+  <!-- Araç Bilgisi -->
+  <div class="arac-card" id="arac-card">
+    <div class="arac-header">
+      <div class="plaka" id="plaka">—</div>
+      <div class="arac-bilgi" id="arac-bilgi">—</div>
+    </div>
+    <div class="arac-meta">
+      <div class="meta-item">
+        <div class="meta-label">Sahip</div>
+        <div class="meta-value" id="meta-sahip">—</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Toplam Ziyaret</div>
+        <div class="meta-value" id="meta-ziyaret">—</div>
+      </div>
+      <div class="meta-item">
+        <div class="meta-label">Son Servis</div>
+        <div class="meta-value" id="meta-son">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ziyaretler -->
+  <div id="ziyaretler-section" style="display:none;">
+    <div class="section-title">ZİYARET GEÇMİŞİ</div>
+    <div id="ziyaretler-list"></div>
+  </div>
+
+  <div class="powered">POWERED BY <span>AutoQR</span></div>
+
+</main>
+
+<script>
+const SUPABASE_URL = 'https://kbaoqhkruwiibjjagmlh.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_HRU1T2X3iFZjAD4dITjQQw_uPPZKZTt';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// URL'den kayıt ID'sini al
+// Desteklenen formatlar:
+//   ?id=AQR-XXXXXX
+//   ?plate=34ABC123
+//   /kayit/AQR-XXXXXX (hash routing)
+function getParam() {
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('id'))    return { type:'id',    value: params.get('id') };
+  if (params.get('plate')) return { type:'plate', value: params.get('plate') };
+  // Hash: #AQR-XXXXXX veya #34ABC123
+  var hash = window.location.hash.replace('#','').trim();
+  if (hash) return { type:'hash', value: hash };
+  return null;
+}
+
+function showError(title, msg) {
+  document.getElementById('loading').style.display      = 'none';
+  document.getElementById('error-box').style.display    = 'block';
+  document.getElementById('error-title').textContent    = title;
+  document.getElementById('error-msg').textContent      = msg;
+}
+
+function formatDate(str) {
+  if (!str) return '—';
+  // datetime-local format → güzel göster
+  if (str.includes('T')) {
+    var d = new Date(str);
+    return d.toLocaleDateString('tr-TR') + ' ' + d.toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+  }
+  return str;
+}
+
+async function yukle() {
+  var param = getParam();
+
+  if (!param) {
+    showError('QR KODU GEÇERSİZ', 'Lütfen QR kodu servis noktasındaki araçtan okutun.');
+    return;
+  }
+
+  try {
+    var arac, ziyaretler;
+
+    if (param.type === 'id' || param.type === 'hash') {
+      // ID ile sorgula (AQR-XXXXXX)
+      var val = param.value;
+      // QR format: "AQR-XXXXXX|34 ABC 123" → sadece ID kısmı
+      if (val.includes('|')) val = val.split('|')[0];
+
+      var { data, error } = await sb.from('araclar').select('*').eq('id', val).single();
+      if (error || !data) throw new Error('Kayıt bulunamadı');
+      arac = data;
+    } else {
+      // Plaka ile sorgula
+      var plate = param.value.replace(/\s+/g,'').toUpperCase();
+      var { data, error } = await sb.from('araclar').select('*').ilike('plate', plate.replace(/(.{2})(.+)/, '$1 $2')).single();
+      if (error || !data) {
+        // Direkt eşleşme dene
+        var { data: data2, error: error2 } = await sb.from('araclar').select('*').ilike('plate', '%' + plate + '%').single();
+        if (error2 || !data2) throw new Error('Plaka bulunamadı');
+        arac = data2;
+      } else {
+        arac = data;
+      }
+    }
+
+    // Ziyaretleri çek
+    var { data: vData } = await sb.from('ziyaretler')
+      .select('*')
+      .eq('arac_id', arac.id)
+      .order('created_at', { ascending: false });
+    ziyaretler = vData || [];
+
+    goster(arac, ziyaretler);
+
+  } catch(err) {
+    showError('KAYIT BULUNAMADI', 'Bu QR koda ait servis kaydı bulunamadı. Servis personeliyle iletişime geçin.');
+    console.error(err);
+  }
+}
+
+function goster(arac, ziyaretler) {
+  document.getElementById('loading').style.display = 'none';
+
+  // Araç bilgileri
+  document.getElementById('plaka').textContent     = arac.plate || '—';
+  document.getElementById('arac-bilgi').textContent = [arac.year, arac.make, arac.model].filter(Boolean).join(' ') || '—';
+  document.getElementById('meta-sahip').textContent  = arac.owner || '—';
+  document.getElementById('meta-ziyaret').textContent = ziyaretler.length + ' ziyaret';
+  document.getElementById('meta-son').textContent    = ziyaretler[0] ? (ziyaretler[0].timestamp || '—') : '—';
+
+  document.getElementById('arac-card').style.display = 'block';
+
+  // Ziyaretler
+  if (ziyaretler.length > 0) {
+    document.getElementById('ziyaretler-section').style.display = 'block';
+    var list = document.getElementById('ziyaretler-list');
+
+    list.innerHTML = ziyaretler.map(function(v, i) {
+      var urgencyClass = v.urgency === 'high' ? 'badge-high' : v.urgency === 'med' ? 'badge-med' : 'badge-low';
+      var urgencyLabel = v.urgency === 'high' ? 'ACİL' : v.urgency === 'med' ? 'ÖNCELİKLİ' : '';
+      var servisler = (v.services || []).map(function(s) {
+        return '<span class="servis-tag">' + s + '</span>';
+      }).join('');
+
+      var detaylar = '';
+      if (v.mileage || v.dropoff || v.pickup) {
+        detaylar = '<div class="visit-details">'
+          + (v.mileage ? '<div class="detail-item"><div class="detail-label">Kilometre</div><div class="detail-value">' + v.mileage + ' km</div></div>' : '')
+          + (v.dropoff ? '<div class="detail-item"><div class="detail-label">Teslim Alma</div><div class="detail-value">' + formatDate(v.dropoff) + '</div></div>' : '')
+          + (v.pickup  ? '<div class="detail-item"><div class="detail-label">Tahmini Teslim</div><div class="detail-value">' + formatDate(v.pickup) + '</div></div>' : '')
+          + '</div>';
+      }
+
+      var notlar = '';
+      var notMetin = [v.owner_notes, v.service_notes].filter(Boolean).join(' · ');
+      if (notMetin) {
+        notlar = '<div class="visit-note">' + notMetin + '</div>';
+      }
+
+      return '<div class="visit-card" style="animation-delay:' + (i * 0.06) + 's">'
+        + '<div class="visit-header">'
+        + '<div class="visit-date">' + (v.timestamp || '—') + '</div>'
+        + (urgencyLabel ? '<span class="badge ' + urgencyClass + '">' + urgencyLabel + '</span>' : '')
+        + '</div>'
+        + '<div class="visit-services">' + (servisler || '<span style="font-size:11px;color:var(--text-muted);">—</span>') + '</div>'
+        + detaylar
+        + notlar
+        + '</div>';
+    }).join('');
+  }
+}
+
+// ── KAMERA ──────────────────────────────────────────
+var videoStream = null;
+var scanning    = false;
+var canvas      = document.createElement('canvas');
+var ctx         = canvas.getContext('2d');
+
+async function kameraBaslat() {
+  document.getElementById('kamera-baslat-wrap').style.display = 'none';
+  document.getElementById('scanner-box').style.display = 'block';
+  try {
+    videoStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
+    });
+    var video = document.getElementById('qr-video');
+    video.srcObject = videoStream;
+    await video.play();
+    scanning = true;
+    document.getElementById('status-dot').className  = 'status-dot active';
+    document.getElementById('status-text').textContent = 'TARAMA AKTIF';
+    document.getElementById('status-text').style.color = 'var(--accent)';
+    taraFrame();
+  } catch(err) {
+    document.getElementById('scanner-box').style.display = 'none';
+    document.getElementById('kamera-baslat-wrap').style.display = 'block';
+    console.warn('Kamera hatası:', err);
+  }
+}
+
+function kameraDurdur() {
+  scanning = false;
+  if (videoStream) {
+    videoStream.getTracks().forEach(function(t) { t.stop(); });
+    videoStream = null;
+  }
+}
+
+function taraFrame() {
+  if (!scanning) return;
+  var video = document.getElementById('qr-video');
+  if (video.readyState === video.HAVE_ENOUGH_DATA) {
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+    var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    var code = jsQR(imgData.data, imgData.width, imgData.height, {
+      inversionAttempts: 'dontInvert'
+    });
+    if (code && code.data) {
+      qrBulundu(code.data);
+      return;
+    }
+  }
+  requestAnimationFrame(taraFrame);
+}
+
+function qrBulundu(data) {
+  scanning = false;
+  kameraDurdur();
+  document.getElementById('status-dot').className  = 'status-dot found';
+  document.getElementById('status-text').textContent = 'KOD OKUNDU';
+  document.getElementById('status-text').style.color = 'var(--success)';
+  document.getElementById('scanner-tip') && (document.getElementById('scanner-tip').textContent = '✓ QR kod okundu, yükleniyor...');
+
+  // Kısa titreşim feedback
+  if (navigator.vibrate) navigator.vibrate(100);
+
+  // Supabase'den yükle
+  yukleQR(data);
+}
+
+function tekrarTara() {
+  document.getElementById('arac-card').style.display         = 'none';
+  document.getElementById('ziyaretler-section').style.display = 'none';
+  document.getElementById('error-box').style.display          = 'none';
+  document.getElementById('scanner-box').style.display        = 'block';
+  var tekrarBtn = document.getElementById('tekrar-btn');
+  if (tekrarBtn) tekrarBtn.style.display = 'none';
+  kameraBaslat();
+}
+
+// ── VERİ YÜKLEME ─────────────────────────────────────
+async function yukleQR(qrData) {
+  document.getElementById('loading').style.display = 'flex';
+  try {
+    // QR format: "AQR-XXXXXX|34 ABC 123"
+    var parca = qrData.split('|');
+    var regId  = parca[0].trim();
+
+    // ARACQR: prefix varsa kaldır
+    if (regId.startsWith('ARACQR:')) regId = regId.replace('ARACQR:', '');
+
+    var { data: arac, error } = await sb.from('araclar').select('*').eq('id', regId).single();
+    if (error || !arac) {
+      // ID ile bulunamazsa plaka ile dene
+      var plate = parca[1] ? parca[1].trim() : '';
+      if (plate) {
+        var { data: arac2, error: e2 } = await sb.from('araclar').select('*').ilike('plate', plate).single();
+        if (e2 || !arac2) throw new Error('Kayıt bulunamadı');
+        arac = arac2;
+      } else throw new Error('Kayıt bulunamadı');
+    }
+
+    var { data: ziyaretler } = await sb.from('ziyaretler')
+      .select('*').eq('arac_id', arac.id)
+      .order('created_at', { ascending: false });
+
+    document.getElementById('loading').style.display = 'none';
+    goster(arac, ziyaretler || []);
+
+    // Tekrar tara butonu ekle
+    if (!document.getElementById('tekrar-btn')) {
+      var btn = document.createElement('button');
+      btn.id = 'tekrar-btn';
+      btn.className = 'btn-tekrar';
+      btn.textContent = '↩ BAŞKA ARAÇ TARA';
+      btn.onclick = tekrarTara;
+      document.querySelector('main').appendChild(btn);
+    } else {
+      document.getElementById('tekrar-btn').style.display = 'block';
+    }
+
+  } catch(err) {
+    document.getElementById('loading').style.display = 'none';
+    showError('KAYIT BULUNAMADI', 'Bu QR koda ait servis kaydı bulunamadı.');
+    // Tekrar tara butonu
+    setTimeout(function() {
+      if (!document.getElementById('tekrar-btn')) {
+        var btn = document.createElement('button');
+        btn.id = 'tekrar-btn';
+        btn.className = 'btn-tekrar';
+        btn.textContent = '↩ TEKRAR TARA';
+        btn.onclick = tekrarTara;
+        document.querySelector('main').appendChild(btn);
+      } else {
+        document.getElementById('tekrar-btn').style.display = 'block';
+      }
+    }, 500);
+  }
+}
+
+// ── BAŞLAT ───────────────────────────────────────────
+// URL'de zaten ID/plaka varsa direkt yükle, yoksa kamerayı aç
+var params = new URLSearchParams(window.location.search);
+var hash   = window.location.hash.replace('#','').trim();
+if (params.get('id') || params.get('plate') || hash) {
+  document.getElementById('scanner-box').style.display = 'none';
+  yukle();
+} else {
+  // Kamerayı otomatik başlatmayı dene
+  kameraBaslat().catch(function() {
+    document.getElementById('scanner-box').style.display = 'none';
+    document.getElementById('kamera-baslat-wrap').style.display = 'block';
+  });
+}
+</script>
+</body>
+</html>
