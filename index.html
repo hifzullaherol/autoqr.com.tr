@@ -936,8 +936,6 @@
 
   <!-- EKRAN 1: ARAÇ LİSTESİ -->
   <div class="mob-ekran aktif" id="mob-liste-ekrani">
-    <div class="mob-servis-adi" id="mob-servis-adi-label">SERVİS</div>
-
     <div class="mob-arama">
       <span class="mob-arama-ikon">🔍</span>
       <input id="mob-arama-input" type="text" placeholder="Plaka veya müşteri ara..."
@@ -1085,8 +1083,15 @@
 // ── STATE ─────────────────────────────────────────────
 // ── SUPABASE ─────────────────────────────────────────
 const SUPABASE_URL = 'https://kbaoqhkruwiibjjagmlh.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_HRU1T2X3iFZjAD4dITjQQw_uPPZKZTt';
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtiYW9xaGtydXdpaWJqamFnbWxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzNjg2NzIsImV4cCI6MjA4Nzk0NDY3Mn0.5Qtiv4T9kw3XaW8uZxZst5jv7gt9Sw5bfF-mkWttJ6M';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+  global: {
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY
+    }
+  }
+});
 
 // ══════════════════════════════════════════════════════
 // MOBİL FONKSIYONLAR  (klonsuz, DOM taşıma yaklaşımı)
