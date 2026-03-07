@@ -435,43 +435,186 @@
     }
   }
 
-  /* ── MOBİL RESPONSIVE ─────────────────────────────── */
+  /* ═══════════════════════════════════════════
+     MOBİL RESPONSIVE  (≤768px)
+  ═══════════════════════════════════════════ */
   @media (max-width: 768px) {
     header { padding: 12px 16px; }
     .logo-text { font-size: 18px; }
     .header-status { display: none; }
     #yukleniyor { font-size: 9px; }
+    header > div:last-of-type button { font-size: 8px; padding: 4px 8px; }
 
-    .main {
-      grid-template-columns: 1fr;
-      min-height: unset;
-    }
+    /* Desktop ana layout gizle */
+    .main { display: none !important; }
 
-    .panel-left {
-      padding: 20px 16px;
-      border-right: none;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .panel-right { padding: 16px; }
-
-    .panel-title { font-size: 28px; }
-
-    .form-grid { grid-template-columns: 1fr; }
-    .services-grid { grid-template-columns: 1fr; }
-    .urgency-row { flex-wrap: wrap; }
-    .step-label { display: none; }
-    .vehicle-list { max-height: 300px; }
+    /* Mobil uygulama görünür */
+    #mobil-uygulama { display: flex !important; }
 
     #login-screen > div { padding: 16px; }
+    #login-screen { padding: 16px; }
   }
+
+  /* ═══════════════════════════════════════════
+     MOBİL UYGULAMA KABI
+  ═══════════════════════════════════════════ */
+  #mobil-uygulama {
+    display: none;
+    flex-direction: column;
+    height: calc(100vh - 61px);
+    position: relative;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  /* ── TAB BAR ── */
+  .mob-tabbar {
+    display: flex;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    flex-shrink: 0;
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    z-index: 20;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .mob-tab {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 10px 4px 8px; gap: 3px;
+    cursor: pointer; border: none;
+    background: transparent; color: var(--text-muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 8px; letter-spacing: 1px; text-transform: uppercase;
+    transition: color 0.2s; border-top: 2px solid transparent;
+  }
+  .mob-tab.aktif { color: var(--accent); border-top-color: var(--accent); }
+  .mob-tab-icon { font-size: 17px; line-height: 1; }
+
+  /* ── EKRANLAR ── */
+  .mob-ekran {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 60px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px 16px 20px;
+  }
+  .mob-ekran.aktif { display: flex; }
+
+  /* ── LİSTE EKRANI ── */
+  .mob-servis-adi {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-dim); margin-bottom: 14px;
+  }
+  .mob-arama {
+    position: relative; margin-bottom: 14px;
+  }
+  .mob-arama input {
+    width: 100%; background: var(--surface);
+    border: 1px solid var(--border); color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px; padding: 10px 34px 10px 34px;
+    border-radius: 6px; outline: none; letter-spacing: 0.5px;
+    transition: border-color 0.2s;
+  }
+  .mob-arama input:focus { border-color: var(--accent); }
+  .mob-arama-ikon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+  .mob-arama-sil { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); background: none; border: none; cursor: pointer; font-size: 13px; padding: 2px; }
+
+  .mob-kart {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px; margin-bottom: 10px;
+    transition: border-color 0.15s;
+  }
+  .mob-kart:active { border-color: var(--accent); }
+  .mob-kart-plaka {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 28px; font-weight: 900;
+    letter-spacing: 4px; color: var(--accent); line-height: 1;
+  }
+  .mob-kart-bilgi { font-size: 12px; color: var(--text-dim); margin: 4px 0 2px; }
+  .mob-kart-zaman { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; }
+  .mob-kart-butonlar {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 7px; margin-top: 10px;
+    padding-top: 10px; border-top: 1px solid var(--border);
+  }
+  .mob-kart-btn {
+    padding: 8px 6px; background: transparent;
+    border: 1px solid var(--border); color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 1px; cursor: pointer;
+    border-radius: 4px; text-transform: uppercase;
+    text-align: center; transition: all 0.15s;
+  }
+  .mob-kart-btn.vurgulu {
+    border-color: rgba(232,255,71,0.35);
+    color: var(--accent); background: rgba(232,255,71,0.05);
+  }
+  .mob-kart-btn:active { opacity: 0.7; }
+
+  .mob-bos {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 60px 20px; gap: 10px;
+    color: var(--text-muted); text-align: center;
+  }
+  .mob-bos-ikon { font-size: 44px; opacity: 0.25; }
+  .mob-bos-yazi { font-size: 11px; letter-spacing: 1px; line-height: 1.7; }
+
+  /* ── FORM EKRANI (gerçek form — klonsuz) ── */
+  #mob-form-ekrani .panel-header { margin-bottom: 20px; }
+  #mob-form-ekrani .panel-title  { font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 700; line-height: 1.1; }
+  #mob-form-ekrani .panel-title .highlight { color: var(--accent); }
+  #mob-form-ekrani .scan-badge   { margin-bottom: 16px; }
+  #mob-form-ekrani .steps        { margin-bottom: 20px; }
+  #mob-form-ekrani .step-label   { font-size: 8px; }
+  #mob-form-ekrani .form-grid    { grid-template-columns: 1fr !important; gap: 12px; }
+  #mob-form-ekrani .services-grid { grid-template-columns: 1fr 1fr !important; }
+  #mob-form-ekrani .urgency-row  { flex-wrap: wrap; }
+  #mob-form-ekrani .form-nav     { margin-top: 20px; }
+  #mob-form-ekrani .btn          { padding: 12px 16px; font-size: 13px; }
+
+  /* ── QR EKRANI ── */
+  .mob-qr-kutu {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 24px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 14px;
+    margin-bottom: 14px;
+  }
+  .mob-qr-plaka {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 36px; font-weight: 900;
+    letter-spacing: 6px; color: var(--accent); text-align: center;
+  }
+  .mob-qr-alt {
+    font-size: 11px; color: var(--text-dim);
+    letter-spacing: 1px; text-align: center; line-height: 1.5;
+  }
+  .mob-qr-btnler {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 8px; width: 100%;
+  }
+  .mob-qr-btn {
+    padding: 12px 6px; background: var(--surface);
+    border: 1px solid var(--border); color: var(--text-dim);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px; letter-spacing: 1px;
+    cursor: pointer; border-radius: 6px;
+    text-transform: uppercase; text-align: center;
+    transition: all 0.15s;
+  }
+  .mob-qr-btn:active { border-color: var(--accent); color: var(--accent); }
 
 </style>
 </head>
 <body>
 
 <!-- GİRİŞ EKRANI -->
-<div id="login-screen" style="display:flex; position:fixed; inset:0; background:var(--bg); z-index:999; align-items:center; justify-content:center; flex-direction:column;">
+<div id="login-screen" style="display:none; position:fixed; inset:0; background:var(--bg); z-index:999; align-items:center; justify-content:center; flex-direction:column;">
   <div style="width:100%; max-width:380px; padding:24px;">
 
     <!-- Logo -->
@@ -783,6 +926,68 @@
 
 
 
+<!-- ═══════════════════════════════════════════
+     MOBİL UYGULAMA  (JS ile ≤768px'de gösterilir)
+════════════════════════════════════════════ -->
+<div id="mobil-uygulama">
+
+  <!-- EKRAN 1: ARAÇ LİSTESİ -->
+  <div class="mob-ekran aktif" id="mob-liste-ekrani">
+    <div class="mob-servis-adi" id="mob-servis-adi-label">SERVİS</div>
+
+    <div class="mob-arama">
+      <span class="mob-arama-ikon">🔍</span>
+      <input id="mob-arama-input" type="text" placeholder="Plaka veya müşteri ara..."
+        oninput="mobAramaYap(this.value)">
+      <button class="mob-arama-sil" onclick="document.getElementById('mob-arama-input').value=''; mobAramaYap('');">✕</button>
+    </div>
+
+    <div id="mob-arac-listesi">
+      <div class="mob-bos">
+        <div class="mob-bos-ikon">🚗</div>
+        <div class="mob-bos-yazi">Henüz araç yok.<br>Aşağıdaki <b style="color:var(--accent)">＋ Kayıt</b> sekmesine dokunun.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EKRAN 2: KAYIT FORMU (asıl form buraya taşınır) -->
+  <div class="mob-ekran" id="mob-form-ekrani">
+    <!-- panel-left DOM'dan buraya move edilir, boş başlar -->
+  </div>
+
+  <!-- EKRAN 3: QR GÖRÜNTÜLE -->
+  <div class="mob-ekran" id="mob-qr-ekrani">
+    <div class="mob-qr-kutu">
+      <div class="mob-qr-plaka" id="mob-qr-plaka-txt">—</div>
+      <div class="mob-qr-alt"   id="mob-qr-alt-txt">—</div>
+      <div id="mob-qrcode-div" style="background:#fff; padding:10px; border-radius:6px;"></div>
+    </div>
+    <div class="mob-qr-btnler">
+      <button class="mob-qr-btn" onclick="mobDownloadQR()">↓ PNG İNDİR</button>
+      <button class="mob-qr-btn" onclick="mobPrintQR()">⎙ YAZDIR</button>
+      <button class="mob-qr-btn" onclick="mobKopyalaLink()">⧉ BAĞLANTI</button>
+      <button class="mob-qr-btn" onclick="mobGecmisAc()">📋 GEÇMİŞ</button>
+    </div>
+    <button class="btn btn-generate"
+      style="width:100%; margin-top:12px; padding:14px; font-size:15px; letter-spacing:2px;"
+      onclick="mobYeniZiyaret()">+ YENİ ZİYARET KAYDET</button>
+  </div>
+
+  <!-- TAB BAR -->
+  <nav class="mob-tabbar">
+    <button class="mob-tab aktif" id="mob-tab-liste" onclick="mobTab('liste')">
+      <span class="mob-tab-icon">🚗</span>Araçlar
+    </button>
+    <button class="mob-tab" id="mob-tab-form" onclick="mobTab('form')">
+      <span class="mob-tab-icon" style="font-size:20px;font-weight:300;">＋</span>Kayıt
+    </button>
+    <button class="mob-tab" id="mob-tab-qr" onclick="mobTab('qr')">
+      <span class="mob-tab-icon">⬛</span>QR Kod
+    </button>
+  </nav>
+</div>
+
+
 <!-- ZİYARET GEÇMİŞİ MODALI -->
 <div id="history-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.88); z-index:250; align-items:center; justify-content:center; backdrop-filter:blur(4px);" onclick="if(event.target===this)closeHistoryModal()">
   <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:28px 28px 20px; max-width:480px; width:94%; max-height:80vh; display:flex; flex-direction:column;">
@@ -881,152 +1086,211 @@ const SUPABASE_KEY = 'sb_publishable_HRU1T2X3iFZjAD4dITjQQw_uPPZKZTt';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ══════════════════════════════════════════════════════
-// MOBİL FONKSİYONLAR
+// MOBİL FONKSIYONLAR  (klonsuz, DOM taşıma yaklaşımı)
 // ══════════════════════════════════════════════════════
-var mobilAktifKayit = null;
+var mobAktifKayit  = null;
+var mobFormTasindi = false;
 
 function mobilMi() { return window.innerWidth <= 768; }
 
-function mobilListeAc() {
-  document.getElementById('mobil-form-ekrani').style.display = 'none';
-  document.getElementById('mobil-qr-ekrani').style.display  = 'none';
-  document.getElementById('mobil-liste-ekrani').style.display = 'flex';
-  mobilListeYenile();
+/* ── Tab geçişi ── */
+function mobTab(tab) {
+  ['liste','form','qr'].forEach(function(t) {
+    var ekran = document.getElementById('mob-' + t + '-ekrani');
+    var btn   = document.getElementById('mob-tab-' + t);
+    if (!ekran || !btn) return;
+    ekran.classList.toggle('aktif', t === tab);
+    btn.classList.toggle('aktif',   t === tab);
+  });
+  if (tab === 'form')  { mobFormHazirla(); }
+  if (tab === 'liste') { mobListeYenile(); }
 }
 
-function mobilFormAc() {
-  document.getElementById('mobil-liste-ekrani').style.display = 'none';
-  document.getElementById('mobil-qr-ekrani').style.display   = 'none';
-  document.getElementById('mobil-form-ekrani').style.display  = 'flex';
-  startNewRegistration();
+/* Eski isimlerle uyumluluk */
+function mobilListeAc() { mobTab('liste'); }
+function mobilFormAc()  { mobTab('form');  }
 
-  // Form içeriğini mobil ekrana taşı
-  var icerik = document.getElementById('mobil-form-icerik');
-  var panelLeft = document.querySelector('.panel-left');
-  if (panelLeft && icerik) {
-    icerik.innerHTML = '';
-    // Form adımlarını kopyala
-    var clone = panelLeft.cloneNode(true);
-    clone.style.padding = '0';
-    clone.style.border  = 'none';
-    icerik.appendChild(clone);
+/* ── Asıl panel-left DOM'unu mob-form-ekrani'na taşı (bir kez) ── */
+function mobFormHazirla() {
+  var formEkrani = document.getElementById('mob-form-ekrani');
+  var panelLeft  = document.querySelector('.panel-left');
+  if (!formEkrani || !panelLeft) return;
+
+  if (!mobFormTasindi) {
+    // panel-left'i fiziksel olarak taşı — klon değil, orijinal
+    formEkrani.appendChild(panelLeft);
+    panelLeft.style.padding = '0';
+    panelLeft.style.border  = 'none';
+    panelLeft.style.overflow = 'visible';
+    mobFormTasindi = true;
   }
+  startNewRegistration();
 }
 
+/* ── QR ekranını göster ── */
 function mobilQREkrani(kayit) {
-  mobilAktifKayit = kayit;
-  document.getElementById('mobil-liste-ekrani').style.display = 'none';
-  document.getElementById('mobil-form-ekrani').style.display  = 'none';
-  document.getElementById('mobil-qr-ekrani').style.display    = 'flex';
+  mobAktifKayit = kayit;
 
-  document.getElementById('mobil-qr-plaka').textContent = kayit.plate;
-  document.getElementById('mobil-arac-bilgi').textContent =
+  document.getElementById('mob-qr-plaka-txt').textContent = kayit.plate;
+  document.getElementById('mob-qr-alt-txt').textContent   =
     [kayit.year, kayit.make, kayit.model, kayit.owner].filter(Boolean).join(' · ');
 
-  // QR kodu oluştur
-  var qrDiv = document.getElementById('mobil-qrcode');
+  var qrDiv = document.getElementById('mob-qrcode-div');
   qrDiv.innerHTML = '';
   new QRCode(qrDiv, {
     text: kayit.qrData || kayit.id,
-    width: 220, height: 220,
-    colorDark: '#000', colorLight: '#fff',
+    width: 210, height: 210,
+    colorDark: '#000000', colorLight: '#ffffff',
     correctLevel: QRCode.CorrectLevel.M
   });
+
+  mobTab('qr');
 }
 
-function mobilListeYenile() {
-  var servisEl = document.getElementById('mobil-servis-adi');
-  if (servisEl) servisEl.textContent = document.getElementById('login-user-label').textContent || '';
+/* ── Araç listesini yenile ── */
+function mobListeYenile(filtre) {
+  var lbl = document.getElementById('mob-servis-adi-label');
+  if (lbl) lbl.textContent = (document.getElementById('login-user-label').textContent || 'SERVİS').toUpperCase();
 
-  var liste = document.getElementById('mobil-arac-listesi');
+  var liste = document.getElementById('mob-arac-listesi');
   if (!liste) return;
 
-  if (kayitlar.length === 0) {
-    liste.innerHTML = '<div style="text-align:center; padding:60px 20px; color:var(--text-muted); font-size:12px; letter-spacing:1px;">Henüz araç kaydedilmedi</div>';
+  var veri = (typeof kayitlar !== 'undefined' ? kayitlar : []).filter(function(r){ return r && r.id; });
+  if (filtre) {
+    var f = filtre.toLowerCase();
+    veri = veri.filter(function(r){
+      return (r.plate||'').toLowerCase().includes(f)
+          || (r.owner||'').toLowerCase().includes(f)
+          || (r.make||'').toLowerCase().includes(f);
+    });
+  }
+
+  if (veri.length === 0) {
+    liste.innerHTML = '<div class="mob-bos">'
+      + '<div class="mob-bos-ikon">🚗</div>'
+      + '<div class="mob-bos-yazi">' + (filtre ? 'Araç bulunamadı.' : 'Henüz araç yok.<br><b style="color:var(--accent)">＋ Kayıt</b> sekmesine dokunun.') + '</div>'
+      + '</div>';
     return;
   }
 
-  liste.innerHTML = kayitlar.filter(function(r){ return r && r.id; }).map(function(r) {
-    return '<div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px;">'
-      + '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">'
-      + '<div style="font-family:\'Barlow Condensed\',sans-serif; font-size:26px; font-weight:900; color:var(--accent); letter-spacing:4px;">' + r.plate + '</div>'
-      + '<button onclick="openHistoryModal(\'' + r.id + '\')" style="padding:4px 10px; background:transparent; border:1px solid var(--accent); color:var(--accent); font-family:\'IBM Plex Mono\',monospace; font-size:9px; cursor:pointer; border-radius:4px; letter-spacing:1px;">📋 ' + (r.visits ? r.visits.length : 0) + '</button>'
-      + '</div>'
-      + '<div style="font-size:12px; color:var(--text-dim);">' + [r.year, r.make, r.model].filter(Boolean).join(' ') + '</div>'
-      + '<div style="font-size:10px; color:var(--text-muted); margin-top:4px;">' + (r.owner || '') + '</div>'
-      + '</div>';
+  liste.innerHTML = veri.map(function(r) {
+    var zSay = r.visits ? r.visits.length : 0;
+    var son  = r.visits && r.visits[0] ? r.visits[0].timestamp : '';
+    // JSON'u HTML attribute için güvenli hale getir
+    var rJson = JSON.stringify(r).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+    return '<div class="mob-kart">'
+      + '<div class="mob-kart-plaka">' + r.plate + '</div>'
+      + '<div class="mob-kart-bilgi">' + [r.year,r.make,r.model].filter(Boolean).join(' ')
+        + (r.owner ? ' · ' + r.owner : '') + '</div>'
+      + (son ? '<div class="mob-kart-zaman">Son: ' + son + '</div>' : '')
+      + '<div class="mob-kart-butonlar">'
+      + '<button class="mob-kart-btn vurgulu" onclick=\'mobilQREkrani(' + rJson + ')\'>⬛ QR Gör</button>'
+      + '<button class="mob-kart-btn" onclick="openHistoryModal(\'' + r.id + '\')">📋 ' + zSay + ' Ziyaret</button>'
+      + '</div></div>';
   }).join('');
 }
 
-function mobilDownloadQR() {
-  if (!mobilAktifKayit) return;
-  aktifQR = mobilAktifKayit;
-  // mobil-qrcode'dan canvas al
-  var qrDiv = document.getElementById('mobil-qrcode');
+/* Eski isimleri yönlendir */
+function mobilListeYenile() { mobListeYenile(); }
+
+function mobAramaYap(v) { mobListeYenile(v); }
+
+/* ── PNG indir ── */
+function mobDownloadQR() {
+  if (!mobAktifKayit) { showNotif('UYARI','Önce bir araç seçin.',true); return; }
+  var qrDiv  = document.getElementById('mob-qrcode-div');
   var canvas = qrDiv ? qrDiv.querySelector('canvas') : null;
-  var img    = qrDiv ? qrDiv.querySelector('img') : null;
-  var qrSrc  = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
-  if (!qrSrc) { showNotif('HATA', 'QR hazır değil.', true); return; }
+  var img    = qrDiv ? qrDiv.querySelector('img')    : null;
+  var src    = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
+  if (!src) { showNotif('HATA','QR henüz hazır değil.',true); return; }
 
   var c = document.createElement('canvas');
-  var sz = 220;
-  var pad = 16;
-  c.width  = sz + pad * 2;
-  c.height = sz + pad * 2 + 50;
+  var sz = 210, pad = 16;
+  c.width = sz + pad*2; c.height = sz + pad*2 + 50;
   var ctx = c.getContext('2d');
-  ctx.fillStyle = '#0a0c0f';
-  ctx.fillRect(0, 0, c.width, c.height);
-  var qImg = new Image();
-  qImg.onload = function() {
-    ctx.drawImage(qImg, pad, pad, sz, sz);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 24px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText(mobilAktifKayit.plate, c.width/2, sz + pad + 34);
-    ctx.fillStyle = '#3d4455';
-    ctx.font = '10px monospace';
-    ctx.fillText('AutoQR', c.width/2, sz + pad + 52);
-    var link = document.createElement('a');
-    link.download = mobilAktifKayit.plate.replace(/\s+/g,'_') + '_QR.png';
-    link.href = c.toDataURL('image/png');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  ctx.fillStyle = '#0a0c0f'; ctx.fillRect(0,0,c.width,c.height);
+  var qi = new Image();
+  qi.onload = function() {
+    ctx.drawImage(qi, pad, pad, sz, sz);
+    ctx.fillStyle = '#e8ff47'; ctx.font = 'bold 22px monospace'; ctx.textAlign = 'center';
+    ctx.fillText(mobAktifKayit.plate, c.width/2, sz+pad+34);
+    ctx.fillStyle = '#3d4455'; ctx.font = '10px monospace';
+    ctx.fillText('AutoQR', c.width/2, sz+pad+52);
+    var a = document.createElement('a');
+    a.download = mobAktifKayit.plate.replace(/\s+/g,'_') + '_QR.png';
+    a.href = c.toDataURL('image/png');
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
   };
-  qImg.src = qrSrc;
+  qi.src = src;
 }
+function mobilDownloadQR() { mobDownloadQR(); }
 
-function mobilPrintQR() {
-  if (!mobilAktifKayit) return;
-  aktifQR = mobilAktifKayit;
-  // Desktop qrcode'a kopyala ve yazdır
-  var qrDiv = document.getElementById('mobil-qrcode');
+/* ── Yazdır ── */
+function mobPrintQR() {
+  if (!mobAktifKayit) { showNotif('UYARI','Önce bir araç seçin.',true); return; }
+  var qrDiv = document.getElementById('mob-qrcode-div');
   var canvas = qrDiv ? qrDiv.querySelector('canvas') : null;
-  var img    = qrDiv ? qrDiv.querySelector('img') : null;
-  var qrSrc  = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
-  if (!qrSrc) return;
+  var img    = qrDiv ? qrDiv.querySelector('img')    : null;
+  var src    = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
+  if (!src) return;
 
   var etiket = document.getElementById('termal-etiket');
-  if (!etiket) { etiket = document.createElement('div'); etiket.id='termal-etiket'; document.body.appendChild(etiket); }
+  if (!etiket) { etiket = document.createElement('div'); etiket.id = 'termal-etiket'; document.body.appendChild(etiket); }
   var servisAdi = document.getElementById('login-user-label').textContent || 'AutoQR';
-  var tarih = new Date().toLocaleDateString('tr-TR');
   etiket.innerHTML =
     '<div style="width:80mm;padding:4mm;font-family:monospace;background:#fff;color:#000;display:flex;flex-direction:column;align-items:center;gap:3mm;">'
     + '<div style="font-size:11pt;font-weight:700;text-align:center;">' + servisAdi + '</div>'
     + '<div style="width:100%;border-top:1px dashed #000;"></div>'
-    + '<img src="' + qrSrc + '" style="width:55mm;height:55mm;">'
-    + '<div style="font-size:22pt;font-weight:900;letter-spacing:5px;border:2px solid #000;padding:2mm 6mm;border-radius:3mm;width:100%;text-align:center;">' + mobilAktifKayit.plate + '</div>'
+    + '<img src="' + src + '" style="width:55mm;height:55mm;">'
+    + '<div style="font-size:22pt;font-weight:900;letter-spacing:5px;border:2px solid #000;padding:2mm 6mm;border-radius:3mm;width:100%;text-align:center;">' + mobAktifKayit.plate + '</div>'
     + '<div style="width:100%;border-top:1px dashed #000;"></div>'
-    + '<div style="display:flex;justify-content:space-between;width:100%;font-size:8pt;color:#666;"><span>' + tarih + '</span><span>AutoQR</span></div>'
-    + '</div>';
+    + '<div style="display:flex;justify-content:space-between;width:100%;font-size:8pt;color:#666;"><span>'
+    + new Date().toLocaleDateString('tr-TR') + '</span><span>AutoQR</span></div></div>';
   window.print();
+}
+function mobilPrintQR() { mobPrintQR(); }
+
+/* ── Bağlantı kopyala ── */
+function mobKopyalaLink() {
+  if (!mobAktifKayit) { showNotif('UYARI','Önce bir araç seçin.',true); return; }
+  var link = window.location.origin + (window.location.pathname.replace('index.html','') || '/') + 'musteri.html?id=' + mobAktifKayit.id;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(link).then(function(){ showNotif('KOPYALANDI','Müşteri bağlantısı kopyalandı.'); });
+  } else { showNotif('BAĞLANTI', link); }
+}
+
+/* ── Geçmiş modal ── */
+function mobGecmisAc() {
+  if (mobAktifKayit) openHistoryModal(mobAktifKayit.id);
+  else showNotif('UYARI','Önce bir araç seçin.',true);
+}
+
+/* ── Yeni ziyaret (QR ekranından) ── */
+function mobYeniZiyaret() {
+  if (!mobAktifKayit) return;
+  mobTab('form');
+  setTimeout(function() {
+    // Formu araç bilgileriyle doldur
+    document.getElementById('plate').value = mobAktifKayit.plate;
+    document.getElementById('year').value  = mobAktifKayit.year  || '';
+    document.getElementById('make').value  = mobAktifKayit.make  || '';
+    document.getElementById('model').value = mobAktifKayit.model || '';
+    document.getElementById('color').value = mobAktifKayit.color || '';
+    var isimler = (mobAktifKayit.owner||'').split(' ');
+    document.getElementById('fname').value = isimler[0] || '';
+    document.getElementById('lname').value = isimler.slice(1).join(' ') || '';
+    document.getElementById('phone').value = mobAktifKayit.phone || '';
+    document.getElementById('section-3').style.pointerEvents = 'all';
+    document.getElementById('section-3').style.opacity = '1';
+    goStep(3);
+  }, 80);
 }
 
 // cloudYukle sonrası mobil listeyi güncelle
 var _origCloudYukle = cloudYukle;
 cloudYukle = async function() {
   await _origCloudYukle();
-  if (mobilMi()) mobilListeYenile();
+  if (mobilMi()) mobListeYenile();
 };
 
 
@@ -1101,7 +1365,7 @@ async function servisYukle(userId) {
   if (data) {
     mevcutServisId = data.id;
     document.getElementById('login-user-label').textContent = data.ad;
-    var mobilServisEl = document.getElementById('mobil-servis-adi');
+    var mobilServisEl = document.getElementById('mob-servis-adi-label');
     if (mobilServisEl) mobilServisEl.textContent = data.ad;
   }
 }
@@ -1124,13 +1388,14 @@ function loginGizle(email) {
   document.getElementById('login-screen').style.display = 'none';
   if (email) {
     document.getElementById('login-user-label').textContent = email;
-    var mobilServisEl = document.getElementById('mobil-servis-adi');
+    var mobilServisEl = document.getElementById('mob-servis-adi-label');
     if (mobilServisEl) mobilServisEl.textContent = email;
   }
   // Mobilde araç listesini aç
   var isMobil = window.matchMedia('(max-width: 768px)').matches;
   if (isMobil) {
-    mobilListeAc();
+    mobTab('liste');
+    mobListeYenile();
   }
 }
 
@@ -1693,6 +1958,9 @@ function renderVehicleList() {
       + '</div>'
       + '</div>';
   }).join('');
+
+  // Mobil listeyi de güncelle
+  if (mobilMi()) mobListeYenile();
 }
 
 function selectVehicle(id) {
