@@ -1779,14 +1779,25 @@ function temizleTumKuyruk() {
   if (kayitlar.length === 0) return;
   showConfirm('Tüm kayıtları silmek istediğinize emin misiniz? Bu işlem geri alınamaz!', async function() {
     showYukleniyor(true);
-    try {
-      if (mevcutServisId) {
-        await sb.from('ziyaretler').delete().eq('servis_id', mevcutServisId);
-        await sb.from('araclar').delete().eq('servis_id', mevcutServisId);
+
+    // Supabase'den sil — önce ziyaretler, sonra araçlar
+    if (mevcutServisId) {
+      var { error: zErr } = await sb.from('ziyaretler').delete().eq('servis_id', mevcutServisId);
+      if (zErr) {
+        showYukleniyor(false);
+        showNotif('HATA', 'Ziyaretler silinemedi: ' + zErr.message, true);
+        console.error('Ziyaret silme hatası:', zErr);
+        return;
       }
-    } catch(err) {
-      console.warn('Cloud silme hatası:', err.message);
+      var { error: aErr } = await sb.from('araclar').delete().eq('servis_id', mevcutServisId);
+      if (aErr) {
+        showYukleniyor(false);
+        showNotif('HATA', 'Araçlar silinemedi: ' + aErr.message, true);
+        console.error('Araç silme hatası:', aErr);
+        return;
+      }
     }
+
     showYukleniyor(false);
     kayitlar.length = 0;
     localStorage.removeItem('arac_kayitlari');
