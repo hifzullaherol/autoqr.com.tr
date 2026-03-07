@@ -437,175 +437,33 @@
 
   /* ── MOBİL RESPONSIVE ─────────────────────────────── */
   @media (max-width: 768px) {
-
-    /* HEADER */
-    header {
-      padding: 12px 16px;
-      position: sticky; top: 0; z-index: 50;
-    }
+    header { padding: 12px 16px; }
     .logo-text { font-size: 18px; }
     .header-status { display: none; }
     #yukleniyor { font-size: 9px; }
-    #login-user-label { display: none; }
 
-    /* LAYOUT: tek kolon, form üstte liste altta */
     .main {
       grid-template-columns: 1fr;
       min-height: unset;
     }
 
-    /* SOL PANEL */
     .panel-left {
-      padding: 16px;
+      padding: 20px 16px;
       border-right: none;
       border-bottom: 1px solid var(--border);
     }
 
-    .panel-header { margin-bottom: 20px; }
-    .scan-badge { font-size: 9px; padding: 5px 10px; margin-bottom: 16px; }
-    .panel-label { font-size: 9px; }
-    .panel-title { font-size: 26px; }
+    .panel-right { padding: 16px; }
 
-    /* ADIM GÖSTERGESİ */
-    .steps { margin-bottom: 24px; gap: 0; }
-    .step-num { width: 28px; height: 28px; font-size: 11px; }
-    .step-label { font-size: 8px; letter-spacing: 0.5px; display: block; }
+    .panel-title { font-size: 28px; }
 
-    /* FORM */
-    .form-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 12px; }
-    .form-grid.full { grid-template-columns: 1fr; }
-
-    .field label { font-size: 9px; }
-    .field input,
-    .field select,
-    .field textarea {
-      font-size: 16px !important; /* iOS zoom engellemek için */
-      padding: 13px 14px;
-      border-radius: 6px;
-    }
-    .field textarea { min-height: 70px; }
-
-    .plaka-input {
-      font-size: 22px !important;
-      letter-spacing: 6px;
-      padding: 16px !important;
-    }
-
-    /* SERVİS KARTLARI */
-    .services-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .service-item { padding: 10px 8px; gap: 7px; }
-    .service-name { font-size: 11px; }
-
-    /* ÖNCELİK BUTONLARI */
-    .urgency-row { gap: 8px; }
-    .urgency-btn { padding: 10px 6px; font-size: 10px; letter-spacing: 0; }
-
-    /* NAVİGASYON BUTONLARI */
-    .form-nav { margin-top: 20px; gap: 10px; }
-    .btn { padding: 14px 16px; font-size: 14px; letter-spacing: 1px; border-radius: 6px; }
-    .btn-generate { font-size: 15px; }
-
-    /* SAĞ PANEL */
-    .panel-right {
-      background: var(--surface);
-      padding: 0;
-    }
-
-    .panel-right-top {
-      padding: 16px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .qr-preview {
-      padding: 16px;
-      min-height: 160px;
-      border-radius: 6px;
-    }
-
-    .qr-plate { font-size: 22px; letter-spacing: 3px; }
-    .qr-vehicle { font-size: 10px; }
-
-    .qr-actions {
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-    .qr-btn { padding: 10px; font-size: 10px; }
-
-    /* ARAMA */
-    .vehicle-list { max-height: none; padding: 12px 16px; }
-
-    /* ARAÇ KARTLARI */
-    .vehicle-card { padding: 12px; }
-    .card-plate { font-size: 16px; }
-    .card-vehicle { font-size: 11px; }
-    .card-services { font-size: 10px; }
-
-    /* BİLDİRİM */
-    .notification {
-      bottom: 16px; right: 16px; left: 16px;
-      max-width: none;
-    }
-
-    /* MODAL */
-    .modal-box { padding: 24px 20px; }
-    .modal-box h2 { font-size: 22px; }
-
-    /* GİRİŞ EKRANI */
-    #login-screen > div { padding: 20px 16px; }
-
-    /* ZİYARET GEÇMİŞİ MODAL */
-    #history-modal > div {
-      padding: 20px 16px 16px !important;
-      max-height: 90vh !important;
-      border-radius: 14px 14px 0 0 !important;
-      position: fixed !important;
-      bottom: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      max-width: 100% !important;
-      width: 100% !important;
-    }
-
-    /* ZİYARET DÜZENLEME MODAL */
-    #edit-visit-modal > div {
-      padding: 20px 16px !important;
-      max-height: 90vh !important;
-      border-radius: 14px 14px 0 0 !important;
-      position: fixed !important;
-      bottom: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      max-width: 100% !important;
-      width: 100% !important;
-    }
-
-    #edit-services-grid {
-      grid-template-columns: 1fr 1fr !important;
-    }
-
-    /* ONAY MODALI */
-    #confirm-modal > div {
-      width: 92% !important;
-      padding: 24px 20px !important;
-    }
-
-    /* YENİ ARAÇ KAYDET BUTONU — mobilde tam genişlik */
-    .list-header > div > .btn-primary {
-      padding: 12px !important;
-      font-size: 13px !important;
-      letter-spacing: 2px !important;
-    }
-
-    /* BÖLÜM AYRAÇLARI */
-    .section-divider { font-size: 8px; margin: 16px 0 12px; }
-  }
-
-  /* Küçük ekranlar için ek düzenlemeler */
-  @media (max-width: 400px) {
+    .form-grid { grid-template-columns: 1fr; }
     .services-grid { grid-template-columns: 1fr; }
-    .panel-title { font-size: 22px; }
-    .btn { font-size: 13px; padding: 13px 12px; }
-    header { padding: 10px 12px; }
+    .urgency-row { flex-wrap: wrap; }
+    .step-label { display: none; }
+    .vehicle-list { max-height: 300px; }
+
+    #login-screen > div { padding: 16px; }
   }
 
 </style>
@@ -1919,7 +1777,17 @@ function editVehicle(id) {
 // ── TÜMÜNÜ SİL ────────────────────────────────────────
 function temizleTumKuyruk() {
   if (kayitlar.length === 0) return;
-  showConfirm('Tüm kayıtları silmek istediğinize emin misiniz?', function() {
+  showConfirm('Tüm kayıtları silmek istediğinize emin misiniz? Bu işlem geri alınamaz!', async function() {
+    showYukleniyor(true);
+    try {
+      if (mevcutServisId) {
+        await sb.from('ziyaretler').delete().eq('servis_id', mevcutServisId);
+        await sb.from('araclar').delete().eq('servis_id', mevcutServisId);
+      }
+    } catch(err) {
+      console.warn('Cloud silme hatası:', err.message);
+    }
+    showYukleniyor(false);
     kayitlar.length = 0;
     localStorage.removeItem('arac_kayitlari');
     aktifAracId = null;
@@ -1930,7 +1798,7 @@ function temizleTumKuyruk() {
     document.getElementById('qr-info').style.display    = 'none';
     document.getElementById('qr-actions').style.display = 'none';
     renderVehicleList();
-    showNotif('SİSTEM', 'Tüm kayıtlar temizlendi.', true);
+    showNotif('SİSTEM', 'Tüm kayıtlar silindi.', true);
   });
 }
 
