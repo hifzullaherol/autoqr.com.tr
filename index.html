@@ -421,12 +421,15 @@
     text-align: center; animation: fadeIn 0.4s ease;
   }
 
+  /* Termal etiket normal ekranda HİÇ görünmez */
+  #termal-etiket {
+    display: none !important;
+  }
+
   @media print {
-    @page {
-      size: 80mm auto;
-      margin: 0;
-    }
+    @page { size: 80mm auto; margin: 0; }
     body * { visibility: hidden; }
+    #termal-etiket { display: block !important; }
     #termal-etiket, #termal-etiket * { visibility: visible; }
     #termal-etiket {
       position: fixed;
@@ -1236,7 +1239,7 @@ function mobPrintQR() {
 
   var etiket = document.getElementById('termal-etiket');
   if (!etiket) { etiket = document.createElement('div'); etiket.id = 'termal-etiket'; document.body.appendChild(etiket); }
-  var servisAdi = document.getElementById('login-user-label').textContent || 'AutoQR';
+  var servisAdi = mevcutServisAdi || document.getElementById('login-user-label').textContent || 'AutoQR';
   etiket.innerHTML =
     '<div style="width:80mm;padding:4mm;font-family:monospace;background:#fff;color:#000;display:flex;flex-direction:column;align-items:center;gap:3mm;">'
     + '<div style="font-size:11pt;font-weight:700;text-align:center;">' + servisAdi + '</div>'
@@ -1246,6 +1249,8 @@ function mobPrintQR() {
     + '<div style="width:100%;border-top:1px dashed #000;"></div>'
     + '<div style="display:flex;justify-content:space-between;width:100%;font-size:8pt;color:#666;"><span>'
     + new Date().toLocaleDateString('tr-TR') + '</span><span>AutoQR</span></div></div>';
+
+  window.onafterprint = function() { etiket.innerHTML = ''; };
   window.print();
 }
 function mobilPrintQR() { mobPrintQR(); }
@@ -1294,7 +1299,8 @@ cloudYukle = async function() {
 };
 
 
-var mevcutServisId = null;
+var mevcutServisId  = null;
+var mevcutServisAdi = null;
 
 function loginTab(tab) {
   if (tab === 'giris') {
@@ -1355,7 +1361,8 @@ async function kayitOl() {
     errEl.style.display = 'block'; return;
   }
 
-  mevcutServisId = servis.id;
+  mevcutServisId  = servis.id;
+  mevcutServisAdi = servisAdi;
   loginGizle(servisAdi);
   cloudYukle();
 }
@@ -1363,10 +1370,11 @@ async function kayitOl() {
 async function servisYukle(userId) {
   var { data } = await sb.from('servisler').select('*').eq('owner_id', userId).single();
   if (data) {
-    mevcutServisId = data.id;
+    mevcutServisId  = data.id;
+    mevcutServisAdi = data.ad;
     document.getElementById('login-user-label').textContent = data.ad;
-    var mobilServisEl = document.getElementById('mob-servis-adi-label');
-    if (mobilServisEl) mobilServisEl.textContent = data.ad;
+    var el = document.getElementById('mob-servis-adi-label');
+    if (el) el.textContent = data.ad;
   }
 }
 
@@ -1386,12 +1394,13 @@ function loginGoster() {
 
 function loginGizle(email) {
   document.getElementById('login-screen').style.display = 'none';
-  if (email) {
-    document.getElementById('login-user-label').textContent = email;
-    var mobilServisEl = document.getElementById('mob-servis-adi-label');
-    if (mobilServisEl) mobilServisEl.textContent = email;
+  // Servis adı varsa onu göster, yoksa email'i fallback olarak kullan
+  var gosterilecek = mevcutServisAdi || email || '';
+  if (gosterilecek) {
+    document.getElementById('login-user-label').textContent = gosterilecek;
+    var el = document.getElementById('mob-servis-adi-label');
+    if (el) el.textContent = gosterilecek;
   }
-  // Mobilde araç listesini aç
   var isMobil = window.matchMedia('(max-width: 768px)').matches;
   if (isMobil) {
     mobTab('liste');
@@ -2099,7 +2108,7 @@ function printQR() {
     document.body.appendChild(etiket);
   }
 
-  var servisAdi = document.getElementById('login-user-label').textContent || 'AutoQR';
+  var servisAdi = mevcutServisAdi || document.getElementById('login-user-label').textContent || 'AutoQR';
   var aracBilgi = [aktifQR.year, aktifQR.make, aktifQR.model].filter(Boolean).join(' ');
   var tarih = new Date().toLocaleDateString('tr-TR');
 
@@ -2116,6 +2125,7 @@ function printQR() {
     + '<span>' + tarih + '</span><span>AutoQR</span></div>'
     + '</div>';
 
+  window.onafterprint = function() { etiket.innerHTML = ''; };
   window.print();
 }
 
