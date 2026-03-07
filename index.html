@@ -1796,6 +1796,9 @@ function temizleTumKuyruk() {
         console.error('Araç silme hatası:', aErr);
         return;
       }
+      // servis_id NULL olan eski kayıtları da sil
+      await sb.from('ziyaretler').delete().is('servis_id', null);
+      await sb.from('araclar').delete().is('servis_id', null);
     }
 
     showYukleniyor(false);
@@ -2071,6 +2074,15 @@ function saveVisitEdit() {
 
 async function cloudKaydet(reg, ziyaret) {
   if (!reg) return;
+  // mevcutServisId henüz yüklenmemişse max 3 saniye bekle
+  if (!mevcutServisId) {
+    var bekle = 0;
+    while (!mevcutServisId && bekle < 30) {
+      await new Promise(function(r){ setTimeout(r, 100); });
+      bekle++;
+    }
+    if (!mevcutServisId) { console.warn("cloudKaydet: mevcutServisId alınamadı, atlandı."); return; }
+  }
   try {
     // Aracı upsert et
     await sb.from('araclar').upsert({
