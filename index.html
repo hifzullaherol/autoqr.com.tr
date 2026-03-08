@@ -480,6 +480,7 @@
     bottom: 0; left: 0; right: 0;
     z-index: 20;
     padding-bottom: env(safe-area-inset-bottom, 0px);
+    overflow: visible;
   }
   .mob-tab {
     flex: 1; display: flex; flex-direction: column;
@@ -979,8 +980,20 @@
     <button class="mob-tab aktif" id="mob-tab-liste" onclick="mobTab('liste')">
       <span class="mob-tab-icon">🚗</span>Araçlar
     </button>
-    <button class="mob-tab" id="mob-tab-form" onclick="mobTab('form')">
-      <span class="mob-tab-icon" style="font-size:20px;font-weight:300;">＋</span>Kayıt
+    <button class="mob-tab" id="mob-tab-form" onclick="mobTab('form')" style="position:relative; overflow:visible;">
+      <div style="
+        position:absolute;
+        top:-22px;
+        left:50%; transform:translateX(-50%);
+        width:52px; height:52px;
+        background:var(--accent);
+        border-radius:50%;
+        display:flex; align-items:center; justify-content:center;
+        font-size:26px; font-weight:300; color:var(--bg);
+        border:3px solid var(--bg);
+        box-shadow:0 0 0 1px var(--accent);
+      ">＋</div>
+      <span style="margin-top:32px; font-size:8px; letter-spacing:1px;">KAYIT</span>
     </button>
     <button class="mob-tab" id="mob-tab-qr" onclick="mobTab('qr')">
       <span class="mob-tab-icon">⬛</span>QR Kod
