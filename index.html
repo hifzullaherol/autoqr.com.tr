@@ -1415,7 +1415,7 @@ function mobilQREkrani(kayit) {
   });
 
   mobTab('qr');
-  setTimeout(function(){ mobQrTabSec('goster'); }, 250);
+  setTimeout(function(){ mobQrTabUI('goster'); }, 150);
 }
 
 /* ── Araç listesini yenile ── */
@@ -2851,6 +2851,7 @@ function qrSonucQRGoster() {
   var reg = kayitlar.find(function(r) { return r.plate === plaka; });
   if (!reg) return;
   mobilQREkrani(reg);
+  mobQrTabSec('goster');
 }
 
 function qrKameraDurdur() {
