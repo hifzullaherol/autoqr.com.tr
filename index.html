@@ -408,6 +408,11 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+  @keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
   @keyframes scanLine {
     0%   { top: 4px; opacity: 1; }
     50%  { top: calc(100% - 6px); opacity: 0.7; }
@@ -1156,6 +1161,15 @@
     <p  id="modal-vehicle-title">—</p>
     <div id="modal-qr"></div>
     <button class="modal-close" onclick="closeModal()">KAPAT</button>
+  </div>
+</div>
+
+<!-- QR SONUÇ MODAL -->
+<div id="qr-sonuc-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:500; align-items:flex-end; justify-content:center; backdrop-filter:blur(6px);">
+  <div style="background:var(--surface); border:1px solid var(--border); border-radius:20px 20px 0 0; padding:24px 20px 36px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; animation:slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);">
+    <!-- Tutamaç -->
+    <div style="width:40px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 20px;"></div>
+    <div id="qr-sonuc-modal-icerik"></div>
   </div>
 </div>
 
@@ -2615,42 +2629,88 @@ function qrTaramaBaslat() {
 }
 
 function qrKodBulundu(data) {
-  // Aynı kodu tekrar tekrar işleme
   if (qrSonucId === data) return;
   qrSonucId = data;
 
   clearInterval(qrScanInterval);
-  qrDurumGuncelle('QR kod okundu!', 'var(--accent)', false);
+  qrKameraDurdur();
 
-  // Kayıtlar içinde ara
+  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+
   var reg = kayitlar.find(function(r) { return r.id === data || r.qrData === data || r.plate === data; });
+  qrSonucModalAc(reg, data);
+}
 
-  var sonucKutu  = document.getElementById('qr-sonuc-kutu');
-  var sonucPlaka = document.getElementById('qr-sonuc-plaka');
-  var sonucBilgi = document.getElementById('qr-sonuc-bilgi');
+function qrSonucModalAc(reg, rawData) {
+  var modal = document.getElementById('qr-sonuc-modal');
+  if (!modal) return;
+
+  var icerik = document.getElementById('qr-sonuc-modal-icerik');
 
   if (reg) {
-    sonucPlaka.textContent = reg.plate;
-    sonucBilgi.textContent = (reg.year||'') + ' ' + (reg.make||'') + ' ' + (reg.model||'') + ' · ' + (reg.owner||'');
-    sonucKutu.style.display = 'block';
-    // Vibrasyon geri bildirimi
-    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-    showNotif('QR OKUNDU', reg.plate + ' bulundu.');
+    var ziyaretSayisi = (reg.visits || []).length;
+    var sonZiyaret = ziyaretSayisi > 0 ? reg.visits[reg.visits.length - 1] : null;
+    var sonServisler = sonZiyaret ? (sonZiyaret.services || []).join(', ') || '—' : '—';
+    var sonTarih = sonZiyaret ? sonZiyaret.timestamp || '—' : '—';
+    var urgencyRenk = sonZiyaret && sonZiyaret.urgency === 'high' ? 'var(--accent2)' : sonZiyaret && sonZiyaret.urgency === 'med' ? 'var(--warning)' : 'var(--success)';
+    var urgencyLabel = sonZiyaret && sonZiyaret.urgency === 'high' ? 'ACİL' : sonZiyaret && sonZiyaret.urgency === 'med' ? 'ÖNCELİKLİ' : 'NORMAL';
+
+    icerik.innerHTML =
+      '<div style="text-align:center; margin-bottom:20px;">'
+    + '  <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(232,255,71,0.1); border:1px solid var(--accent); border-radius:20px; padding:6px 16px; font-size:10px; letter-spacing:2px; color:var(--accent); margin-bottom:16px;">✓ QR KOD OKUNDU</div>'
+    + '  <div style="font-family:'Barlow Condensed',sans-serif; font-size:48px; font-weight:900; letter-spacing:6px; color:var(--accent); line-height:1;">' + reg.plate + '</div>'
+    + '  <div style="font-size:13px; color:var(--text-dim); margin-top:6px;">' + (reg.year||'') + ' ' + (reg.make||'') + ' ' + (reg.model||'') + '</div>'
+    + '  <div style="font-size:12px; color:var(--text-dim);">' + (reg.owner||'') + (reg.phone ? ' · ' + reg.phone : '') + '</div>'
+    + '</div>'
+    + '<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">'
+    + '  <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px;">'
+    + '    <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Toplam Ziyaret</div>'
+    + '    <div style="font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:700; color:var(--text);">' + ziyaretSayisi + '</div>'
+    + '  </div>'
+    + '  <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px;">'
+    + '    <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Son Durum</div>'
+    + '    <div style="font-size:11px; font-weight:700; color:' + urgencyRenk + ';">' + (sonZiyaret ? urgencyLabel : '—') + '</div>'
+    + '  </div>'
+    + '</div>'
+    + (sonZiyaret ? '<div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:20px;">'
+    + '  <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px;">Son Ziyaret</div>'
+    + '  <div style="font-size:12px; color:var(--text); margin-bottom:4px;">' + sonServisler + '</div>'
+    + '  <div style="font-size:10px; color:var(--text-muted);">' + sonTarih + '</div>'
+    + '</div>' : '')
+    + '<div style="display:flex; flex-direction:column; gap:10px;">'
+    + '  <button onclick="qrModalZiyaret('' + reg.id + '')" style="width:100%; padding:14px; background:var(--accent); border:none; color:var(--bg); font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; letter-spacing:3px; cursor:pointer; border-radius:8px;">＋ YENİ ZİYARET KAYDET</button>'
+    + '  <button onclick="qrModalGecmis('' + reg.id + '')" style="width:100%; padding:12px; background:transparent; border:1px solid var(--accent); color:var(--accent); font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:2px; cursor:pointer; border-radius:8px; text-transform:uppercase;">📋 Ziyaret Geçmişi</button>'
+    + '  <button onclick="qrSonucModalKapat()" style="width:100%; padding:12px; background:transparent; border:1px solid var(--border); color:var(--text-dim); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; cursor:pointer; border-radius:8px; text-transform:uppercase;">↩ Tekrar Tara</button>'
+    + '</div>';
   } else {
-    sonucPlaka.textContent = '?';
-    sonucBilgi.textContent = 'Bu QR kodu kayıtlarda bulunamadı: ' + data.substring(0, 40);
-    sonucKutu.style.display = 'block';
-    showNotif('ARAÇ BULUNAMADI', 'Kayıtlarda eşleşme yok.', true);
+    icerik.innerHTML =
+      '<div style="text-align:center; padding:20px 0;">'
+    + '  <div style="font-size:56px; margin-bottom:12px;">🔍</div>'
+    + '  <div style="font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:700; letter-spacing:2px; color:var(--accent2); margin-bottom:8px;">ARAÇ BULUNAMADI</div>'
+    + '  <div style="font-size:12px; color:var(--text-dim); line-height:1.6; margin-bottom:24px;">Bu QR kod sistemde kayıtlı değil.<br><span style="color:var(--text-muted); font-size:10px;">' + (rawData||'').substring(0, 50) + '</span></div>'
+    + '  <button onclick="qrSonucModalKapat()" style="width:100%; padding:14px; background:var(--accent); border:none; color:var(--bg); font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; letter-spacing:3px; cursor:pointer; border-radius:8px;">↩ TEKRAR TARA</button>'
+    + '</div>';
   }
 
-  // 3 saniye sonra tekrar taramaya devam et
-  setTimeout(function() {
-    if (qrStream) {
-      qrSonucId = null;
-      qrTaramaBaslat();
-      qrDurumGuncelle('QR kodu kameraya gösterin', 'var(--success)', true);
-    }
-  }, 3000);
+  modal.style.display = 'flex';
+}
+
+function qrSonucModalKapat() {
+  document.getElementById('qr-sonuc-modal').style.display = 'none';
+  qrSonucId = null;
+  setTimeout(function(){ qrKameraBaslat(); }, 300);
+}
+
+function qrModalZiyaret(regId) {
+  document.getElementById('qr-sonuc-modal').style.display = 'none';
+  aktifPlakaId = regId;
+  yeniZiyaretBaslat();
+  mobTab('form');
+}
+
+function qrModalGecmis(regId) {
+  document.getElementById('qr-sonuc-modal').style.display = 'none';
+  openHistoryModal(regId);
 }
 
 function qrKameraDurdur() {
