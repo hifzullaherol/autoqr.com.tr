@@ -1366,7 +1366,7 @@ function mobTab(tab) {
   });
   if (tab === 'form')  { mobFormHazirla(); }
   if (tab === 'liste') { mobListeYenile(); }
-  if (tab === 'qr')    { setTimeout(function(){ mobQrTabSec('tara'); }, 200); }
+  if (tab === 'qr')    { setTimeout(function(){ mobQrTabUI('tara'); }, 100); }
   if (tab !== 'qr')    { if (typeof qrKameraDurdur === 'function') qrKameraDurdur(); }
 }
 
@@ -2700,35 +2700,33 @@ var qrStream = null;
 var qrScanInterval = null;
 var qrSonucId = null;
 
-function mobQrTabSec(tab) {
+function mobQrTabUI(tab) {
   var panelTara   = document.getElementById('qr-panel-tara');
   var panelGoster = document.getElementById('qr-panel-goster');
   var tabTara     = document.getElementById('mob-qr-tab-tara');
   var tabGoster   = document.getElementById('mob-qr-tab-goster');
+  if (!panelTara || !panelGoster) return;
 
+  var isTara = tab === 'tara';
+  panelTara.style.display   = isTara ? 'block' : 'none';
+  panelGoster.style.display = isTara ? 'none'  : 'block';
+
+  tabTara.style.background    = isTara ? 'var(--accent)'  : 'var(--surface)';
+  tabTara.style.color         = isTara ? 'var(--bg)'      : 'var(--text-dim)';
+  tabTara.style.fontWeight    = isTara ? '700'            : '400';
+  tabTara.style.borderBottom  = isTara ? '2px solid var(--accent)' : '2px solid transparent';
+
+  tabGoster.style.background   = isTara ? 'var(--surface)' : 'var(--accent)';
+  tabGoster.style.color        = isTara ? 'var(--text-dim)' : 'var(--bg)';
+  tabGoster.style.fontWeight   = isTara ? '400'            : '700';
+  tabGoster.style.borderBottom = isTara ? '2px solid transparent' : '2px solid var(--accent)';
+}
+
+function mobQrTabSec(tab) {
+  mobQrTabUI(tab);
   if (tab === 'tara') {
-    panelTara.style.display   = 'block';
-    panelGoster.style.display = 'none';
-    tabTara.style.background  = 'var(--accent)';
-    tabTara.style.color       = 'var(--bg)';
-    tabTara.style.fontWeight  = '700';
-    tabTara.style.borderBottom = '2px solid var(--accent)';
-    tabGoster.style.background = 'var(--surface)';
-    tabGoster.style.color      = 'var(--text-dim)';
-    tabGoster.style.fontWeight = '400';
-    tabGoster.style.borderBottom = '2px solid transparent';
-    qrKameraBaslat();
+    if (!qrStream || !qrStream.active) qrKameraBaslat();
   } else {
-    panelTara.style.display   = 'none';
-    panelGoster.style.display = 'block';
-    tabGoster.style.background = 'var(--accent)';
-    tabGoster.style.color      = 'var(--bg)';
-    tabGoster.style.fontWeight = '700';
-    tabGoster.style.borderBottom = '2px solid var(--accent)';
-    tabTara.style.background  = 'var(--surface)';
-    tabTara.style.color       = 'var(--text-dim)';
-    tabTara.style.fontWeight  = '400';
-    tabTara.style.borderBottom = '2px solid transparent';
     qrKameraDurdur();
   }
 }
