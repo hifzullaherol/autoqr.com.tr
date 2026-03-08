@@ -124,63 +124,16 @@
     border-bottom:1px solid var(--border);
   }
 
-  /* ── TÜRK PLAKASI ── */
-  .plaka-wrap {
-    display: inline-flex;
-    align-items: stretch;
-    border-radius: 6px;
-    overflow: hidden;
-    border: 2px solid #1a3a8f;
-    box-shadow: 0 4px 20px rgba(26,58,143,0.4), 0 0 0 1px rgba(255,255,255,0.06);
-    margin-bottom: 10px;
-    background: #fff;
-  }
-
-  .plaka-sol {
-    background: #1a3a8f;
-    width: 32px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    padding: 4px 0;
-    flex-shrink: 0;
-  }
-  .plaka-sol .eu-stars {
-    font-size: 8px;
-    color: #FFD700;
-    letter-spacing: -1px;
-    line-height: 1;
-    text-align: center;
-  }
-  .plaka-sol .tr-text {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 9px;
-    font-weight: 700;
-    color: #fff;
-    letter-spacing: 1px;
-  }
-
-  .plaka-text {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 38px;
-    font-weight: 900;
-    letter-spacing: 5px;
-    color: #111;
-    line-height: 1;
-    padding: 8px 16px 8px 12px;
-    background: #fff;
-  }
-
   .plaka {
-    /* kept for JS reference, actual display via .plaka-text */
-    display: none;
+    font-family:'Barlow Condensed',sans-serif;
+    font-size:42px; font-weight:900;
+    letter-spacing:6px; color:var(--accent);
+    line-height:1;
   }
 
   .arac-bilgi {
     font-size:13px; color:var(--text-dim);
-    margin-top:2px; letter-spacing:1px;
+    margin-top:6px; letter-spacing:1px;
   }
 
   /* ── HIZLI ARAMA BUTONU ── */
@@ -496,15 +449,7 @@
   <!-- Araç Bilgisi -->
   <div class="arac-card" id="arac-card">
     <div class="arac-header">
-      <!-- Gerçek Türk Plakası -->
-      <div class="plaka-wrap" id="plaka-wrap">
-        <div class="plaka-sol">
-          <div class="eu-stars">★★★<br>★ ★<br>★★★</div>
-          <div class="tr-text">TR</div>
-        </div>
-        <div class="plaka-text" id="plaka">—</div>
-      </div>
-      <div class="plaka" id="plaka-hidden" style="display:none;">—</div>
+      <div class="plaka" id="plaka">—</div>
       <div class="arac-bilgi" id="arac-bilgi">—</div>
     </div>
     <div class="arac-meta">
