@@ -464,7 +464,7 @@
   #mobil-uygulama {
     display: none;
     flex-direction: column;
-    height: calc(100dvh - 61px);
+    height: calc(100svh - 61px);
     position: relative;
     overflow: hidden;
     background: var(--bg);
@@ -1411,7 +1411,7 @@ function loginGizle(email) {
     setTimeout(function() {
       var h = document.querySelector('header').offsetHeight;
       var mobEl = document.getElementById('mobil-uygulama');
-      if (mobEl) mobEl.style.height = 'calc(100dvh - ' + h + 'px)';
+      if (mobEl) mobEl.style.height = 'calc(100svh - ' + h + 'px)';
     }, 50);
     mobTab('liste');
     mobListeYenile();
@@ -1484,7 +1484,7 @@ window.onload = function() {
   function mobYukseklikAyarla() {
     var h = document.querySelector('header').offsetHeight;
     var el = document.getElementById('mobil-uygulama');
-    if (el) el.style.height = 'calc(100dvh - ' + h + 'px)';
+    if (el) el.style.height = 'calc(100svh - ' + h + 'px)';
   }
   mobYukseklikAyarla();
   window.addEventListener('resize', mobYukseklikAyarla);
