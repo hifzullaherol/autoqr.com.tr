@@ -464,7 +464,7 @@
   #mobil-uygulama {
     display: none;
     flex-direction: column;
-    height: calc(100vh - 61px);
+    height: calc(100dvh - 61px);
     position: relative;
     overflow: hidden;
     background: var(--bg);
@@ -1476,6 +1476,14 @@ const SERVISLER = [
 
 // ── SAYFA HAZIR ───────────────────────────────────────
 window.onload = function() {
+  // Mobil yüksekliği header'a göre dinamik ayarla
+  function mobYukseklikAyarla() {
+    var h = document.querySelector('header').offsetHeight;
+    var el = document.getElementById('mobil-uygulama');
+    if (el) el.style.height = 'calc(100dvh - ' + h + 'px)';
+  }
+  mobYukseklikAyarla();
+  window.addEventListener('resize', mobYukseklikAyarla);
   // Eski localStorage verisini yeni formata migrate et
   kayitlar.forEach(function(r, i) {
     if (!r) return;
