@@ -408,11 +408,6 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-  @keyframes slideUp {
-    from { transform: translateY(100%); opacity: 0; }
-    to   { transform: translateY(0);    opacity: 1; }
-  }
-
   @keyframes scanLine {
     0%   { top: 4px; opacity: 1; }
     50%  { top: calc(100% - 6px); opacity: 0.7; }
@@ -632,6 +627,116 @@
   }
   .mob-qr-btn:active { border-color: var(--accent); color: var(--accent); }
 
+  /* ── HESAP MODALİ ── */
+  #hesap-modal {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85); z-index: 300;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(6px);
+  }
+  #hesap-modal.open { display: flex; }
+
+  .hesap-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; width: 90%; max-width: 440px;
+    overflow: hidden; animation: fadeIn 0.25s ease;
+  }
+
+  .hesap-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 24px; border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .hesap-baslik {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--accent);
+  }
+  .hesap-kapat {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-muted); font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; padding: 5px 12px; cursor: pointer;
+    border-radius: 4px; letter-spacing: 1px; transition: all 0.2s;
+  }
+  .hesap-kapat:hover { border-color: var(--text); color: var(--text); }
+
+  .hesap-body { padding: 24px; }
+
+  .hesap-avatar {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: rgba(232,255,71,0.12); border: 2px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 26px; font-weight: 900; color: var(--accent);
+    margin: 0 auto 20px; letter-spacing: 1px;
+  }
+
+  .hesap-info-row {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 14px 16px; margin-bottom: 12px;
+  }
+  .hesap-info-label {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 4px;
+  }
+  .hesap-info-val {
+    font-size: 14px; color: var(--text); font-weight: 500;
+  }
+
+  .hesap-divider {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text-muted); margin: 20px 0 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hesap-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .hesap-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+  .hesap-field label {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim);
+  }
+  .hesap-field input {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px; padding: 10px 14px; border-radius: 4px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .hesap-field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(232,255,71,0.1);
+  }
+
+  .hesap-btn-row { display: flex; gap: 10px; margin-top: 6px; }
+  .hesap-btn {
+    flex: 1; padding: 11px; border: none; cursor: pointer;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; border-radius: 4px; transition: all 0.2s;
+  }
+  .hesap-btn-primary { background: var(--accent); color: var(--bg); }
+  .hesap-btn-primary:hover { background: #d4e83e; }
+  .hesap-btn-danger {
+    background: transparent; color: #ff4747;
+    border: 1px solid #ff4747;
+  }
+  .hesap-btn-danger:hover { background: rgba(255,71,71,0.08); }
+
+  .hesap-msg {
+    font-size: 11px; padding: 8px 12px; border-radius: 4px;
+    margin-bottom: 12px; display: none; letter-spacing: 0.5px;
+  }
+  .hesap-msg.ok  { color: var(--success); background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); }
+  .hesap-msg.err { color: var(--accent2); background: rgba(255,107,53,0.08); border: 1px solid rgba(255,107,53,0.2); }
+
+  /* Hesap butonu - header */
+  .hesap-ikon-btn {
+    background: rgba(232,255,71,0.08); border: 1.5px solid var(--accent);
+    color: var(--accent); cursor: pointer; border-radius: 50%;
+    width: 32px; height: 32px; display: flex; align-items: center;
+    justify-content: center; font-size: 15px; transition: all 0.2s;
+    flex-shrink: 0; box-shadow: 0 0 8px rgba(232,255,71,0.15);
+  }
+  .hesap-ikon-btn:hover { background: rgba(232,255,71,0.18); box-shadow: 0 0 14px rgba(232,255,71,0.3); }
+
 </style>
 </head>
 <body>
@@ -727,8 +832,9 @@
     YÜKLENIYOR
   </div>
   <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
-  <div style="display:flex; align-items:center; gap:12px;">
+  <div style="display:flex; align-items:center; gap:10px;">
     <div style="font-size:10px; color:var(--text-dim); letter-spacing:1px;" id="login-user-label"></div>
+    <button class="hesap-ikon-btn" onclick="hesapAc()" title="Hesabım">👤</button>
     <button onclick="cikisYap()" style="background:transparent; border:1px solid var(--border); color:var(--text-dim); font-family:'IBM Plex Mono',monospace; font-size:10px; padding:5px 12px; cursor:pointer; border-radius:4px; letter-spacing:1px; text-transform:uppercase;">ÇIKIŞ</button>
   </div>
   <div class="header-status">
@@ -1164,19 +1270,58 @@
   </div>
 </div>
 
-<!-- QR SONUÇ MODAL -->
-<div id="qr-sonuc-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:500; align-items:flex-end; justify-content:center; backdrop-filter:blur(6px);">
-  <div style="background:var(--surface); border:1px solid var(--border); border-radius:20px 20px 0 0; padding:24px 20px 36px; width:100%; max-width:480px; max-height:90vh; overflow-y:auto; animation:slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);">
-    <!-- Tutamaç -->
-    <div style="width:40px; height:4px; background:var(--border); border-radius:2px; margin:0 auto 20px;"></div>
-    <div id="qr-sonuc-modal-icerik"></div>
-  </div>
-</div>
-
 <!-- BİLDİRİM -->
 <div class="notification" id="notification">
   <div class="notif-title" id="notif-title">BAŞARILI</div>
   <div id="notif-msg">Araç başarıyla kaydedildi.</div>
+</div>
+
+<!-- HESAP MODALİ -->
+<div id="hesap-modal">
+  <div class="hesap-box">
+    <div class="hesap-header">
+      <div class="hesap-baslik">⚙ Hesabım</div>
+      <button class="hesap-kapat" onclick="hesapKapat()">✕ KAPAT</button>
+    </div>
+    <div class="hesap-body">
+      <!-- Avatar -->
+      <div id="hesap-avatar" class="hesap-avatar">??</div>
+
+      <!-- Mevcut bilgiler -->
+      <div class="hesap-info-row">
+        <div class="hesap-info-label">Servis Adı</div>
+        <div class="hesap-info-val" id="hesap-servis-adi-val">—</div>
+      </div>
+      <div class="hesap-info-row">
+        <div class="hesap-info-label">E-Posta</div>
+        <div class="hesap-info-val" id="hesap-email-val">—</div>
+      </div>
+
+      <!-- Güncelleme formu -->
+      <div class="hesap-divider">Bilgileri Güncelle</div>
+
+      <div id="hesap-msg" class="hesap-msg"></div>
+
+      <div class="hesap-field">
+        <label>Servis Adı</label>
+        <input type="text" id="hesap-yeni-ad" placeholder="Servis adınız">
+      </div>
+      <div class="hesap-field">
+        <label>Yeni Şifre <span style="color:var(--text-muted); font-size:9px;">(boş bırakırsanız değişmez)</span></label>
+        <input type="password" id="hesap-yeni-sifre" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div class="hesap-field">
+        <label>Şifre Tekrar</label>
+        <input type="password" id="hesap-sifre-tekrar" placeholder="••••••••" autocomplete="new-password"
+          onkeydown="if(event.key==='Enter')hesapGuncelle()">
+      </div>
+
+      <div class="hesap-btn-row">
+        <button class="hesap-btn hesap-btn-primary" id="hesap-kaydet-btn" onclick="hesapGuncelle()">KAYDET</button>
+        <button class="hesap-btn hesap-btn-danger" onclick="hesapKapat();cikisYap()">ÇIKIŞ YAP</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -1490,6 +1635,7 @@ async function loginKontrol() {
   var { data: { session } } = await sb.auth.getSession();
   if (session) {
     await servisYukle(session.user.id);
+    mevcutEmail = session.user.email;
     loginGizle(session.user.email);
   } else {
     loginGoster();
@@ -1548,6 +1694,7 @@ async function loginYap() {
   }
 
   await servisYukle(data.user.id);
+  mevcutEmail = data.user.email;
   loginGizle(data.user.email);
   cloudYukle();
 }
@@ -1562,6 +1709,7 @@ async function cikisYap() {
 // kayitlar: cloud'dan yüklenir, localStorage yedek olarak tutulur
 const kayitlar = JSON.parse(localStorage.getItem('arac_kayitlari')) || [];
 let   cloudYuklendi = false;
+let   mevcutEmail   = '';
 let   mevcutOncelik = 'low';
 let   aktifQR       = null;
 let   aktifAracId   = null;
@@ -2629,88 +2777,42 @@ function qrTaramaBaslat() {
 }
 
 function qrKodBulundu(data) {
+  // Aynı kodu tekrar tekrar işleme
   if (qrSonucId === data) return;
   qrSonucId = data;
 
   clearInterval(qrScanInterval);
-  qrKameraDurdur();
+  qrDurumGuncelle('QR kod okundu!', 'var(--accent)', false);
 
-  if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
-
+  // Kayıtlar içinde ara
   var reg = kayitlar.find(function(r) { return r.id === data || r.qrData === data || r.plate === data; });
-  qrSonucModalAc(reg, data);
-}
 
-function qrSonucModalAc(reg, rawData) {
-  var modal = document.getElementById('qr-sonuc-modal');
-  if (!modal) return;
-
-  var icerik = document.getElementById('qr-sonuc-modal-icerik');
+  var sonucKutu  = document.getElementById('qr-sonuc-kutu');
+  var sonucPlaka = document.getElementById('qr-sonuc-plaka');
+  var sonucBilgi = document.getElementById('qr-sonuc-bilgi');
 
   if (reg) {
-    var ziyaretSayisi = (reg.visits || []).length;
-    var sonZiyaret = ziyaretSayisi > 0 ? reg.visits[reg.visits.length - 1] : null;
-    var sonServisler = sonZiyaret ? (sonZiyaret.services || []).join(', ') || '—' : '—';
-    var sonTarih = sonZiyaret ? sonZiyaret.timestamp || '—' : '—';
-    var urgencyRenk = sonZiyaret && sonZiyaret.urgency === 'high' ? 'var(--accent2)' : sonZiyaret && sonZiyaret.urgency === 'med' ? 'var(--warning)' : 'var(--success)';
-    var urgencyLabel = sonZiyaret && sonZiyaret.urgency === 'high' ? 'ACİL' : sonZiyaret && sonZiyaret.urgency === 'med' ? 'ÖNCELİKLİ' : 'NORMAL';
-
-    icerik.innerHTML =
-      '<div style="text-align:center; margin-bottom:20px;">'
-    + '  <div style="display:inline-flex; align-items:center; gap:8px; background:rgba(232,255,71,0.1); border:1px solid var(--accent); border-radius:20px; padding:6px 16px; font-size:10px; letter-spacing:2px; color:var(--accent); margin-bottom:16px;">✓ QR KOD OKUNDU</div>'
-    + '  <div style="font-family:'Barlow Condensed',sans-serif; font-size:48px; font-weight:900; letter-spacing:6px; color:var(--accent); line-height:1;">' + reg.plate + '</div>'
-    + '  <div style="font-size:13px; color:var(--text-dim); margin-top:6px;">' + (reg.year||'') + ' ' + (reg.make||'') + ' ' + (reg.model||'') + '</div>'
-    + '  <div style="font-size:12px; color:var(--text-dim);">' + (reg.owner||'') + (reg.phone ? ' · ' + reg.phone : '') + '</div>'
-    + '</div>'
-    + '<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">'
-    + '  <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px;">'
-    + '    <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Toplam Ziyaret</div>'
-    + '    <div style="font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:700; color:var(--text);">' + ziyaretSayisi + '</div>'
-    + '  </div>'
-    + '  <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px;">'
-    + '    <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px;">Son Durum</div>'
-    + '    <div style="font-size:11px; font-weight:700; color:' + urgencyRenk + ';">' + (sonZiyaret ? urgencyLabel : '—') + '</div>'
-    + '  </div>'
-    + '</div>'
-    + (sonZiyaret ? '<div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:20px;">'
-    + '  <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px;">Son Ziyaret</div>'
-    + '  <div style="font-size:12px; color:var(--text); margin-bottom:4px;">' + sonServisler + '</div>'
-    + '  <div style="font-size:10px; color:var(--text-muted);">' + sonTarih + '</div>'
-    + '</div>' : '')
-    + '<div style="display:flex; flex-direction:column; gap:10px;">'
-    + '  <button onclick="qrModalZiyaret('' + reg.id + '')" style="width:100%; padding:14px; background:var(--accent); border:none; color:var(--bg); font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; letter-spacing:3px; cursor:pointer; border-radius:8px;">＋ YENİ ZİYARET KAYDET</button>'
-    + '  <button onclick="qrModalGecmis('' + reg.id + '')" style="width:100%; padding:12px; background:transparent; border:1px solid var(--accent); color:var(--accent); font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:2px; cursor:pointer; border-radius:8px; text-transform:uppercase;">📋 Ziyaret Geçmişi</button>'
-    + '  <button onclick="qrSonucModalKapat()" style="width:100%; padding:12px; background:transparent; border:1px solid var(--border); color:var(--text-dim); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; cursor:pointer; border-radius:8px; text-transform:uppercase;">↩ Tekrar Tara</button>'
-    + '</div>';
+    sonucPlaka.textContent = reg.plate;
+    sonucBilgi.textContent = (reg.year||'') + ' ' + (reg.make||'') + ' ' + (reg.model||'') + ' · ' + (reg.owner||'');
+    sonucKutu.style.display = 'block';
+    // Vibrasyon geri bildirimi
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    showNotif('QR OKUNDU', reg.plate + ' bulundu.');
   } else {
-    icerik.innerHTML =
-      '<div style="text-align:center; padding:20px 0;">'
-    + '  <div style="font-size:56px; margin-bottom:12px;">🔍</div>'
-    + '  <div style="font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:700; letter-spacing:2px; color:var(--accent2); margin-bottom:8px;">ARAÇ BULUNAMADI</div>'
-    + '  <div style="font-size:12px; color:var(--text-dim); line-height:1.6; margin-bottom:24px;">Bu QR kod sistemde kayıtlı değil.<br><span style="color:var(--text-muted); font-size:10px;">' + (rawData||'').substring(0, 50) + '</span></div>'
-    + '  <button onclick="qrSonucModalKapat()" style="width:100%; padding:14px; background:var(--accent); border:none; color:var(--bg); font-family:'Barlow Condensed',sans-serif; font-size:18px; font-weight:700; letter-spacing:3px; cursor:pointer; border-radius:8px;">↩ TEKRAR TARA</button>'
-    + '</div>';
+    sonucPlaka.textContent = '?';
+    sonucBilgi.textContent = 'Bu QR kodu kayıtlarda bulunamadı: ' + data.substring(0, 40);
+    sonucKutu.style.display = 'block';
+    showNotif('ARAÇ BULUNAMADI', 'Kayıtlarda eşleşme yok.', true);
   }
 
-  modal.style.display = 'flex';
-}
-
-function qrSonucModalKapat() {
-  document.getElementById('qr-sonuc-modal').style.display = 'none';
-  qrSonucId = null;
-  setTimeout(function(){ qrKameraBaslat(); }, 300);
-}
-
-function qrModalZiyaret(regId) {
-  document.getElementById('qr-sonuc-modal').style.display = 'none';
-  aktifPlakaId = regId;
-  yeniZiyaretBaslat();
-  mobTab('form');
-}
-
-function qrModalGecmis(regId) {
-  document.getElementById('qr-sonuc-modal').style.display = 'none';
-  openHistoryModal(regId);
+  // 3 saniye sonra tekrar taramaya devam et
+  setTimeout(function() {
+    if (qrStream) {
+      qrSonucId = null;
+      qrTaramaBaslat();
+      qrDurumGuncelle('QR kodu kameraya gösterin', 'var(--success)', true);
+    }
+  }, 3000);
 }
 
 function qrKameraDurdur() {
@@ -2745,6 +2847,70 @@ function qrSonucZiyaret() {
     qrKameraDurdur();
     yeniZiyaretBaslat();
     mobTab('form');
+  }
+}
+
+// ── HESAP MODALİ ─────────────────────────────────────
+function hesapAc() {
+  var modal = document.getElementById('hesap-modal');
+  if (!modal) return;
+  document.getElementById('hesap-servis-adi-val').textContent = mevcutServisAdi || '—';
+  document.getElementById('hesap-email-val').textContent      = mevcutEmail || '—';
+  var avatar = document.getElementById('hesap-avatar');
+  var adi = mevcutServisAdi || mevcutEmail || '?';
+  avatar.textContent = adi.substring(0, 2).toUpperCase();
+  document.getElementById('hesap-yeni-ad').value       = mevcutServisAdi || '';
+  document.getElementById('hesap-yeni-sifre').value    = '';
+  document.getElementById('hesap-sifre-tekrar').value  = '';
+  hesapMesajGizle();
+  modal.classList.add('open');
+}
+function hesapKapat() {
+  document.getElementById('hesap-modal').classList.remove('open');
+}
+function hesapMesajGoster(msg, tip) {
+  var el = document.getElementById('hesap-msg');
+  el.textContent = msg;
+  el.className = 'hesap-msg ' + tip;
+  el.style.display = 'block';
+}
+function hesapMesajGizle() {
+  var el = document.getElementById('hesap-msg');
+  if (el) el.style.display = 'none';
+}
+async function hesapGuncelle() {
+  var yeniAd      = document.getElementById('hesap-yeni-ad').value.trim();
+  var yeniSifre   = document.getElementById('hesap-yeni-sifre').value;
+  var sifreTekrar = document.getElementById('hesap-sifre-tekrar').value;
+  var btn         = document.getElementById('hesap-kaydet-btn');
+  if (!yeniAd) { hesapMesajGoster('Servis adı boş bırakılamaz.', 'err'); return; }
+  if (yeniSifre && yeniSifre.length < 6) { hesapMesajGoster('Şifre en az 6 karakter olmalıdır.', 'err'); return; }
+  if (yeniSifre && yeniSifre !== sifreTekrar) { hesapMesajGoster('Şifreler eşleşmiyor.', 'err'); return; }
+  btn.textContent = 'KAYDEDİLİYOR...';
+  btn.style.opacity = '0.7';
+  hesapMesajGizle();
+  try {
+    if (mevcutServisId) {
+      var { error: adHata } = await sb.from('servisler').update({ ad: yeniAd }).eq('id', mevcutServisId);
+      if (adHata) throw adHata;
+      mevcutServisAdi = yeniAd;
+      document.getElementById('login-user-label').textContent = yeniAd;
+      document.getElementById('hesap-servis-adi-val').textContent = yeniAd;
+      var mobEl = document.getElementById('mob-servis-adi-label');
+      if (mobEl) mobEl.textContent = yeniAd;
+    }
+    if (yeniSifre) {
+      var { error: sifreHata } = await sb.auth.updateUser({ password: yeniSifre });
+      if (sifreHata) throw sifreHata;
+    }
+    hesapMesajGoster('Bilgiler başarıyla güncellendi ✓', 'ok');
+    document.getElementById('hesap-yeni-sifre').value   = '';
+    document.getElementById('hesap-sifre-tekrar').value = '';
+  } catch(err) {
+    hesapMesajGoster('Hata: ' + (err.message || 'Güncelleme başarısız.'), 'err');
+  } finally {
+    btn.textContent = 'KAYDET';
+    btn.style.opacity = '1';
   }
 }
 
