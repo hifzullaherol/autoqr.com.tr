@@ -1400,7 +1400,6 @@ function loginGoster() {
 
 function loginGizle(email) {
   document.getElementById('login-screen').style.display = 'none';
-  // Servis adı varsa onu göster, yoksa email'i fallback olarak kullan
   var gosterilecek = mevcutServisAdi || email || '';
   if (gosterilecek) {
     document.getElementById('login-user-label').textContent = gosterilecek;
@@ -1409,6 +1408,11 @@ function loginGizle(email) {
   }
   var isMobil = window.matchMedia('(max-width: 768px)').matches;
   if (isMobil) {
+    setTimeout(function() {
+      var h = document.querySelector('header').offsetHeight;
+      var mobEl = document.getElementById('mobil-uygulama');
+      if (mobEl) mobEl.style.height = 'calc(100dvh - ' + h + 'px)';
+    }, 50);
     mobTab('liste');
     mobListeYenile();
   }
