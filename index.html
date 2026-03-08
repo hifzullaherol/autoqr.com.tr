@@ -15,12 +15,12 @@
     --bg: #0a0c0f;
     --surface: #12151a;
     --surface2: #1a1e26;
-    --border: #252a35;
+    --border: #2e3445;
     --accent: #e8ff47;
     --accent2: #ff6b35;
-    --text: #e8eaf0;
-    --text-dim: #6b7280;
-    --text-muted: #3d4455;
+    --text: #f5f7ff;
+    --text-dim: #c8cfe0;
+    --text-muted: #8892aa;
     --success: #22c55e;
     --warning: #f59e0b;
   }
@@ -112,7 +112,7 @@
   .panel-header { margin-bottom: 32px; }
 
   .panel-label {
-    font-size: 10px; letter-spacing: 3px;
+    font-size: 11px; letter-spacing: 3px;
     text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px;
   }
 
@@ -152,7 +152,7 @@
   }
 
   .step-label {
-    font-size: 9px; letter-spacing: 1px;
+    font-size: 10px; letter-spacing: 1px;
     text-transform: uppercase; color: var(--text-muted);
   }
   .step.active .step-label { color: var(--accent); }
@@ -174,7 +174,7 @@
   .field { display: flex; flex-direction: column; gap: 6px; }
 
   .field label {
-    font-size: 9px; letter-spacing: 2px;
+    font-size: 10px; letter-spacing: 2px;
     text-transform: uppercase; color: var(--text-dim);
   }
 
@@ -232,7 +232,7 @@
   }
   .service-item.checked .service-check::after { content: '✓'; }
 
-  .service-name { font-size: 12px; font-weight: 500; }
+  .service-name { font-size: 13px; font-weight: 500; }
 
   .urgency-row { display: flex; gap: 10px; margin-bottom: 20px; }
 
@@ -302,8 +302,8 @@
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 28px; font-weight: 900; letter-spacing: 4px; color: var(--accent);
   }
-  .qr-vehicle { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; margin-top: 4px; }
-  .qr-id { font-size: 9px; color: var(--text-muted); letter-spacing: 2px; margin-top: 4px; }
+  .qr-vehicle { font-size: 12px; color: var(--text-dim); letter-spacing: 1px; margin-top: 4px; }
+  .qr-id { font-size: 10px; color: var(--text-muted); letter-spacing: 2px; margin-top: 4px; }
 
   .qr-actions { display: none; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
 
@@ -323,7 +323,7 @@
     display: flex; align-items: center;
     justify-content: space-between; margin-bottom: 16px;
   }
-  .list-title { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-dim); }
+  .list-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--text-dim); }
   .list-count {
     background: var(--accent); color: var(--bg);
     font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 10px;
@@ -348,16 +348,16 @@
     font-size: 18px; font-weight: 700; letter-spacing: 2px; color: var(--accent);
   }
 
-  .card-vehicle { font-size: 12px; color: var(--text-dim); margin-bottom: 4px; }
-  .card-services { font-size: 10px; color: var(--text-muted); }
+  .card-vehicle { font-size: 13px; color: var(--text-dim); margin-bottom: 4px; }
+  .card-services { font-size: 11px; color: var(--text-muted); }
   .card-time {
-    font-size: 9px; color: var(--text-muted); letter-spacing: 1px;
+    font-size: 10px; color: var(--text-muted); letter-spacing: 1px;
     margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border);
   }
 
   .empty-list { text-align: center; padding: 40px 20px; color: var(--text-muted); }
   .empty-icon { font-size: 36px; margin-bottom: 12px; opacity: 0.3; }
-  .empty-text { font-size: 11px; letter-spacing: 1px; }
+  .empty-text { font-size: 12px; letter-spacing: 1px; }
 
   /* ── BİLDİRİM ── */
   .notification {
@@ -408,6 +408,12 @@
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
+  @keyframes scanLine {
+    0%   { top: 4px; opacity: 1; }
+    50%  { top: calc(100% - 6px); opacity: 0.7; }
+    100% { top: 4px; opacity: 1; }
+  }
+
   .scan-badge {
     display: inline-flex; align-items: center; gap: 8px;
     background: rgba(232,255,71,0.08); border: 1px solid rgba(232,255,71,0.2);
@@ -417,7 +423,7 @@
   .scan-badge::before { content: '▶'; font-size: 8px; animation: pulse 1.5s infinite; }
 
   .section-divider {
-    font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
     color: var(--text-muted); margin: 20px 0 14px;
     display: flex; align-items: center; gap: 12px;
   }
@@ -497,7 +503,7 @@
     cursor: pointer; border: none;
     background: transparent; color: var(--text-muted);
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 8px; letter-spacing: 1px; text-transform: uppercase;
+    font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
     transition: color 0.2s; border-top: 2px solid transparent;
   }
   .mob-tab.aktif { color: var(--accent); border-top-color: var(--accent); }
@@ -517,7 +523,7 @@
 
   /* ── LİSTE EKRANI ── */
   .mob-servis-adi {
-    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
     color: var(--text-dim); margin-bottom: 14px;
   }
   .mob-arama {
@@ -546,8 +552,8 @@
     font-size: 28px; font-weight: 900;
     letter-spacing: 4px; color: var(--accent); line-height: 1;
   }
-  .mob-kart-bilgi { font-size: 12px; color: var(--text-dim); margin: 4px 0 2px; }
-  .mob-kart-zaman { font-size: 9px; color: var(--text-muted); letter-spacing: 1px; }
+  .mob-kart-bilgi { font-size: 13px; color: var(--text-dim); margin: 4px 0 2px; }
+  .mob-kart-zaman { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; }
   .mob-kart-butonlar {
     display: grid; grid-template-columns: 1fr 1fr;
     gap: 7px; margin-top: 10px;
@@ -557,7 +563,7 @@
     padding: 8px 6px; background: transparent;
     border: 1px solid var(--border); color: var(--text-dim);
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px; letter-spacing: 1px; cursor: pointer;
+    font-size: 10px; letter-spacing: 1px; cursor: pointer;
     border-radius: 4px; text-transform: uppercase;
     text-align: center; transition: all 0.15s;
   }
@@ -574,7 +580,7 @@
     color: var(--text-muted); text-align: center;
   }
   .mob-bos-ikon { font-size: 44px; opacity: 0.25; }
-  .mob-bos-yazi { font-size: 11px; letter-spacing: 1px; line-height: 1.7; }
+  .mob-bos-yazi { font-size: 12px; letter-spacing: 1px; line-height: 1.7; }
 
   /* ── FORM EKRANI (gerçek form — klonsuz) ── */
   #mob-form-ekrani .panel-header { margin-bottom: 20px; }
@@ -603,7 +609,7 @@
     letter-spacing: 6px; color: var(--accent); text-align: center;
   }
   .mob-qr-alt {
-    font-size: 11px; color: var(--text-dim);
+    font-size: 12px; color: var(--text-dim);
     letter-spacing: 1px; text-align: center; line-height: 1.5;
   }
   .mob-qr-btnler {
@@ -614,7 +620,7 @@
     padding: 12px 6px; background: var(--surface);
     border: 1px solid var(--border); color: var(--text-dim);
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 9px; letter-spacing: 1px;
+    font-size: 10px; letter-spacing: 1px;
     cursor: pointer; border-radius: 6px;
     text-transform: uppercase; text-align: center;
     transition: all 0.15s;
@@ -646,14 +652,14 @@
     <!-- Giriş Formu -->
     <div id="form-giris" style="background:var(--surface); border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; padding:28px;">
       <div style="margin-bottom:14px;">
-        <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">E-Posta</div>
+        <div style="font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:6px;">E-Posta</div>
         <input id="login-email" type="email" autocomplete="email"
           style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:13px; padding:10px 14px; border-radius:5px; outline:none;"
           placeholder="servis@example.com"
           onkeydown="if(event.key==='Enter')document.getElementById('login-pass').focus()">
       </div>
       <div style="margin-bottom:20px;">
-        <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">Şifre</div>
+        <div style="font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:6px;">Şifre</div>
         <input id="login-pass" type="password" autocomplete="current-password"
           style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:13px; padding:10px 14px; border-radius:5px; outline:none;"
           placeholder="••••••••"
@@ -669,25 +675,25 @@
     <!-- Kayıt Formu -->
     <div id="form-kayit" style="display:none; background:var(--surface); border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; padding:28px;">
       <div style="margin-bottom:14px;">
-        <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">Servis Adı *</div>
+        <div style="font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:6px;">Servis Adı *</div>
         <input id="reg-servis-adi" type="text"
           style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:13px; padding:10px 14px; border-radius:5px; outline:none;"
           placeholder="Örn: Ahmet Oto Servis">
       </div>
       <div style="margin-bottom:14px;">
-        <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">E-Posta *</div>
+        <div style="font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:6px;">E-Posta *</div>
         <input id="reg-email" type="email"
           style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:13px; padding:10px 14px; border-radius:5px; outline:none;"
           placeholder="servis@example.com">
       </div>
       <div style="margin-bottom:14px;">
-        <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">Şifre *</div>
+        <div style="font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:6px;">Şifre *</div>
         <input id="reg-pass" type="password"
           style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:13px; padding:10px 14px; border-radius:5px; outline:none;"
           placeholder="En az 6 karakter">
       </div>
       <div style="margin-bottom:20px;">
-        <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:6px;">Telefon</div>
+        <div style="font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:6px;">Telefon</div>
         <input id="reg-telefon" type="tel"
           style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:13px; padding:10px 14px; border-radius:5px; outline:none;"
           placeholder="0532 000 0000">
@@ -718,7 +724,7 @@
   <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
   <div style="display:flex; align-items:center; gap:12px;">
     <div style="font-size:10px; color:var(--text-dim); letter-spacing:1px;" id="login-user-label"></div>
-    <button onclick="cikisYap()" style="background:transparent; border:1px solid var(--border); color:var(--text-muted); font-family:'IBM Plex Mono',monospace; font-size:9px; padding:5px 12px; cursor:pointer; border-radius:4px; letter-spacing:1px; text-transform:uppercase;">ÇIKIŞ</button>
+    <button onclick="cikisYap()" style="background:transparent; border:1px solid var(--border); color:var(--text-dim); font-family:'IBM Plex Mono',monospace; font-size:10px; padding:5px 12px; cursor:pointer; border-radius:4px; letter-spacing:1px; text-transform:uppercase;">ÇIKIŞ</button>
   </div>
   <div class="header-status">
     <span class="status-dot"></span>
@@ -965,22 +971,93 @@
     <!-- panel-left DOM'dan buraya move edilir, boş başlar -->
   </div>
 
-  <!-- EKRAN 3: QR GÖRÜNTÜLE -->
+  <!-- EKRAN 3: QR OKUYUCU + GÖRÜNTÜLE -->
   <div class="mob-ekran" id="mob-qr-ekrani">
-    <div class="mob-qr-kutu">
-      <div class="mob-qr-plaka" id="mob-qr-plaka-txt">—</div>
-      <div class="mob-qr-alt"   id="mob-qr-alt-txt">—</div>
-      <div id="mob-qrcode-div" style="background:#fff; padding:10px; border-radius:6px;"></div>
+
+    <!-- SEKMELİ BAŞLIK -->
+    <div style="display:flex; gap:0; margin-bottom:16px; border:1px solid var(--border); border-radius:8px; overflow:hidden;">
+      <button id="qr-tab-tara" onclick="qrTabSec('tara')"
+        style="flex:1; padding:11px; background:var(--accent); border:none; color:var(--bg);
+        font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; cursor:pointer; font-weight:700;">
+        📷 QR TARA
+      </button>
+      <button id="qr-tab-goster" onclick="qrTabSec('goster')"
+        style="flex:1; padding:11px; background:var(--surface); border:none; color:var(--text-dim);
+        font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; cursor:pointer;">
+        ⬛ QR GÖSTER
+      </button>
     </div>
-    <div class="mob-qr-btnler">
-      <button class="mob-qr-btn" onclick="mobDownloadQR()">↓ PNG İNDİR</button>
-      <button class="mob-qr-btn" onclick="mobPrintQR()">⎙ YAZDIR</button>
-      <button class="mob-qr-btn" onclick="mobKopyalaLink()">⧉ BAĞLANTI</button>
-      <button class="mob-qr-btn" onclick="mobGecmisAc()">📋 GEÇMİŞ</button>
+
+    <!-- TARAYICI PANELİ -->
+    <div id="qr-panel-tara">
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:14px;">
+        <div style="position:relative; width:100%; aspect-ratio:1/1; background:#000;">
+          <video id="qr-video" style="width:100%; height:100%; object-fit:cover; display:block;" playsinline muted></video>
+          <canvas id="qr-canvas" style="display:none;"></canvas>
+          <!-- Tarama çerçevesi -->
+          <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;">
+            <div style="width:65%; aspect-ratio:1/1; position:relative;">
+              <div style="position:absolute; top:0; left:0; width:28px; height:28px; border-top:3px solid var(--accent); border-left:3px solid var(--accent); border-radius:2px 0 0 0;"></div>
+              <div style="position:absolute; top:0; right:0; width:28px; height:28px; border-top:3px solid var(--accent); border-right:3px solid var(--accent); border-radius:0 2px 0 0;"></div>
+              <div style="position:absolute; bottom:0; left:0; width:28px; height:28px; border-bottom:3px solid var(--accent); border-left:3px solid var(--accent); border-radius:0 0 0 2px;"></div>
+              <div style="position:absolute; bottom:0; right:0; width:28px; height:28px; border-bottom:3px solid var(--accent); border-right:3px solid var(--accent); border-radius:0 0 2px 0;"></div>
+              <div id="qr-scan-line" style="position:absolute; left:4px; right:4px; height:2px; background:linear-gradient(90deg, transparent, var(--accent), transparent); top:0; animation:scanLine 2s ease-in-out infinite;"></div>
+            </div>
+          </div>
+          <!-- Kamera kapalı overlay -->
+          <div id="qr-camera-off" style="position:absolute; inset:0; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;">
+            <div style="font-size:48px; opacity:0.3;">📷</div>
+            <div style="font-size:11px; color:var(--text-muted); letter-spacing:2px; text-align:center;">KAMERA KAPALI</div>
+          </div>
+        </div>
+        <div style="padding:14px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+          <div id="qr-scan-status" style="font-size:11px; color:var(--text-dim); letter-spacing:1px;">Taramak için kamerayı başlatın</div>
+          <div id="qr-scan-dot" style="width:8px; height:8px; border-radius:50%; background:var(--text-muted);"></div>
+        </div>
+      </div>
+
+      <button id="qr-baslat-btn" onclick="qrKameraBaslat()"
+        style="width:100%; padding:14px; background:var(--accent); border:none; color:var(--bg);
+        font-family:'Barlow Condensed',sans-serif; font-size:17px; font-weight:700;
+        letter-spacing:3px; cursor:pointer; border-radius:8px; margin-bottom:10px;">
+        📷 KAMERAYI BAŞLAT
+      </button>
+      <button id="qr-durdur-btn" onclick="qrKameraDurdur()" style="display:none;
+        width:100%; padding:14px; background:transparent; border:1px solid var(--border); color:var(--text-dim);
+        font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700;
+        letter-spacing:3px; cursor:pointer; border-radius:8px; margin-bottom:10px;">
+        ✕ DURDUR
+      </button>
+
+      <div id="qr-sonuc-kutu" style="display:none; background:var(--surface); border:1px solid var(--accent); border-radius:10px; padding:16px; margin-top:4px;">
+        <div style="font-size:9px; letter-spacing:3px; color:var(--accent); text-transform:uppercase; margin-bottom:8px;">✓ QR KOD OKUNDU</div>
+        <div id="qr-sonuc-plaka" style="font-family:'Barlow Condensed',sans-serif; font-size:32px; font-weight:900; letter-spacing:4px; color:var(--accent);"></div>
+        <div id="qr-sonuc-bilgi" style="font-size:12px; color:var(--text-dim); margin:6px 0 12px;"></div>
+        <div style="display:flex; gap:8px;">
+          <button onclick="qrSonucGecmis()" style="flex:1; padding:10px; background:rgba(232,255,71,0.08); border:1px solid var(--accent); color:var(--accent); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1px; cursor:pointer; border-radius:6px; text-transform:uppercase;">📋 GEÇMİŞ</button>
+          <button onclick="qrSonucZiyaret()" style="flex:1; padding:10px; background:var(--accent2); border:none; color:white; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1px; cursor:pointer; border-radius:6px; text-transform:uppercase;">＋ ZİYARET</button>
+        </div>
+      </div>
     </div>
-    <button class="btn btn-generate"
-      style="width:100%; margin-top:12px; padding:14px; font-size:15px; letter-spacing:2px;"
-      onclick="mobYeniZiyaret()">+ YENİ ZİYARET KAYDET</button>
+
+    <!-- QR GÖSTER PANELİ -->
+    <div id="qr-panel-goster" style="display:none;">
+      <div class="mob-qr-kutu">
+        <div class="mob-qr-plaka" id="mob-qr-plaka-txt">—</div>
+        <div class="mob-qr-alt"   id="mob-qr-alt-txt">—</div>
+        <div id="mob-qrcode-div" style="background:#fff; padding:10px; border-radius:6px;"></div>
+      </div>
+      <div class="mob-qr-btnler">
+        <button class="mob-qr-btn" onclick="mobDownloadQR()">↓ PNG İNDİR</button>
+        <button class="mob-qr-btn" onclick="mobPrintQR()">⎙ YAZDIR</button>
+        <button class="mob-qr-btn" onclick="mobKopyalaLink()">⧉ BAĞLANTI</button>
+        <button class="mob-qr-btn" onclick="mobGecmisAc()">📋 GEÇMİŞ</button>
+      </div>
+      <button class="btn btn-generate"
+        style="width:100%; margin-top:12px; padding:14px; font-size:15px; letter-spacing:2px;"
+        onclick="mobYeniZiyaret()">+ YENİ ZİYARET KAYDET</button>
+    </div>
+
   </div>
 
   <!-- TAB BAR -->
@@ -1020,7 +1097,7 @@
       </div>
       <button onclick="closeHistoryModal()" style="background:transparent; border:1px solid var(--border); color:var(--text-dim); font-family:'IBM Plex Mono',monospace; font-size:10px; padding:6px 14px; cursor:pointer; border-radius:4px; letter-spacing:1px; text-transform:uppercase;">KAPAT</button>
     </div>
-    <div style="font-size:9px; letter-spacing:3px; color:var(--text-muted); text-transform:uppercase; margin-bottom:12px;">ZİYARET GEÇMİŞİ</div>
+    <div style="font-size:11px; letter-spacing:3px; color:var(--text-dim); text-transform:uppercase; margin-bottom:12px;">ZİYARET GEÇMİŞİ</div>
     <div id="hist-list" style="overflow-y:auto; max-height:420px; display:flex; flex-direction:column; gap:8px;"></div>
     <div style="margin-top:16px; padding-top:16px; border-top:1px solid var(--border);">
       <button class="btn btn-generate" style="width:100%; font-size:14px; padding:12px;" onclick="closeHistoryModal(); yeniZiyaretBaslat()">+ YENİ ZİYARET KAYDET</button>
@@ -1039,10 +1116,10 @@
     <input type="hidden" id="edit-visit-reg-id">
     <input type="hidden" id="edit-visit-id">
 
-    <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px;">Servisler</div>
+    <div style="font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:8px;">Servisler</div>
     <div id="edit-services-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px;"></div>
 
-    <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:8px;">Öncelik</div>
+    <div style="font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:8px;">Öncelik</div>
     <div style="display:flex; gap:8px; margin-bottom:16px;">
       <button class="edit-urgency-btn low selected" data-level="low" onclick="document.querySelectorAll('.edit-urgency-btn').forEach(function(b){b.classList.remove('selected')}); this.classList.add('selected')" style="flex:1; padding:8px; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:10px; cursor:pointer; border-radius:4px; letter-spacing:1px;">◉</button>
       <button class="edit-urgency-btn med" data-level="med" onclick="document.querySelectorAll('.edit-urgency-btn').forEach(function(b){b.classList.remove('selected')}); this.classList.add('selected')" style="flex:1; padding:8px; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:10px; cursor:pointer; border-radius:4px; letter-spacing:1px;">ÖNCELİKLİ</button>
@@ -1050,21 +1127,21 @@
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-      <div><div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px;">Kilometre</div>
+      <div><div style="font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:5px;">Kilometre</div>
         <input id="edit-visit-km" type="number" style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:12px; padding:8px 10px; border-radius:4px; outline:none;"></div>
       <div></div>
-      <div><div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px;">Teslim Alma</div>
+      <div><div style="font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:5px;">Teslim Alma</div>
         <input id="edit-visit-dropoff" type="datetime-local" style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:11px; padding:8px 10px; border-radius:4px; outline:none;"></div>
-      <div><div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px;">Teslim Etme</div>
+      <div><div style="font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:5px;">Teslim Etme</div>
         <input id="edit-visit-pickup" type="datetime-local" style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:11px; padding:8px 10px; border-radius:4px; outline:none;"></div>
     </div>
 
     <div style="margin-bottom:10px;">
-      <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px;">Müşteri Notu</div>
+      <div style="font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:5px;">Müşteri Notu</div>
       <textarea id="edit-visit-owner-notes" style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:12px; padding:8px 10px; border-radius:4px; outline:none; resize:vertical; min-height:60px;"></textarea>
     </div>
     <div style="margin-bottom:18px;">
-      <div style="font-size:9px; letter-spacing:2px; color:var(--text-muted); text-transform:uppercase; margin-bottom:5px;">Servis Notu</div>
+      <div style="font-size:11px; letter-spacing:2px; color:var(--text-dim); text-transform:uppercase; margin-bottom:5px;">Servis Notu</div>
       <textarea id="edit-visit-service-notes" style="width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:12px; padding:8px 10px; border-radius:4px; outline:none; resize:vertical; min-height:60px;"></textarea>
     </div>
 
@@ -1133,6 +1210,7 @@ function mobTab(tab) {
   });
   if (tab === 'form')  { mobFormHazirla(); }
   if (tab === 'liste') { mobListeYenile(); }
+  if (tab !== 'qr') { qrKameraDurdur && qrKameraDurdur(); }
 }
 
 /* Eski isimlerle uyumluluk */
@@ -2287,8 +2365,8 @@ function openHistoryModal(id) {
         + '<div style="font-size:9px; padding:2px 8px; border-radius:10px; border:1px solid ' + urgencyColor + '; color:' + urgencyColor + ';">' + urgencyLabel + '</div>'
         + '</div>'
         + '<div style="font-size:11px; color:var(--text); margin-bottom:4px;">' + servisler + '</div>'
-        + (v.mileage ? '<div style="font-size:10px; color:var(--text-muted);">Km: ' + v.mileage + '</div>' : '')
-        + (v.ownerNotes || v.serviceNotes ? '<div style="font-size:10px; color:var(--text-muted); margin-top:4px; font-style:italic;">' + [v.ownerNotes, v.serviceNotes].filter(Boolean).join(' | ') + '</div>' : '')
+        + (v.mileage ? '<div style="font-size:11px; color:var(--text-dim);">Km: ' + v.mileage + '</div>' : '')
+        + (v.ownerNotes || v.serviceNotes ? '<div style="font-size:11px; color:var(--text-dim); margin-top:4px; font-style:italic;">' + [v.ownerNotes, v.serviceNotes].filter(Boolean).join(' | ') + '</div>' : '')
         + '<div style="display:flex; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid var(--border);">'
         + '<button onclick="editVisit(\'' + id + '\',\'' + vid + '\')" style="flex:1; padding:7px 0; background:rgba(232,255,71,0.08); border:1px solid var(--accent); color:var(--accent); font-family:\'IBM Plex Mono\',monospace; font-size:10px; letter-spacing:1px; cursor:pointer; border-radius:4px; text-transform:uppercase;">✎ DÜZENLE</button>'
         + '<button onclick="showConfirm(\'Bu ziyareti silmek istiyor musunuz?\', function(){ deleteVisit(\'' + id + '\',\'' + vid + '\') })" style="flex:1; padding:7px 0; background:rgba(255,71,71,0.08); border:1px solid #ff4747; color:#ff4747; font-family:\'IBM Plex Mono\',monospace; font-size:10px; letter-spacing:1px; cursor:pointer; border-radius:4px; text-transform:uppercase;">✕ SİL</button>'
@@ -2456,6 +2534,171 @@ function yeniZiyaretBaslat() {
 }
 
 // ── BİLDİRİM ──────────────────────────────────────────
+// ── QR TARAYICI ─────────────────────────────────────
+var qrStream = null;
+var qrScanInterval = null;
+var qrSonucId = null;
+
+function qrTabSec(tab) {
+  var panelTara   = document.getElementById('qr-panel-tara');
+  var panelGoster = document.getElementById('qr-panel-goster');
+  var tabTara     = document.getElementById('qr-tab-tara');
+  var tabGoster   = document.getElementById('qr-tab-goster');
+
+  if (tab === 'tara') {
+    panelTara.style.display   = 'block';
+    panelGoster.style.display = 'none';
+    tabTara.style.background  = 'var(--accent)';
+    tabTara.style.color       = 'var(--bg)';
+    tabTara.style.fontWeight  = '700';
+    tabGoster.style.background = 'var(--surface)';
+    tabGoster.style.color     = 'var(--text-dim)';
+    tabGoster.style.fontWeight = '400';
+  } else {
+    panelTara.style.display   = 'none';
+    panelGoster.style.display = 'block';
+    tabGoster.style.background = 'var(--accent)';
+    tabGoster.style.color     = 'var(--bg)';
+    tabGoster.style.fontWeight = '700';
+    tabTara.style.background  = 'var(--surface)';
+    tabTara.style.color       = 'var(--text-dim)';
+    tabTara.style.fontWeight  = '400';
+    qrKameraDurdur();
+  }
+}
+
+function qrDurumGuncelle(msg, renk, aktif) {
+  var st  = document.getElementById('qr-scan-status');
+  var dot = document.getElementById('qr-scan-dot');
+  if (st)  st.textContent = msg;
+  if (dot) dot.style.background = renk || 'var(--text-muted)';
+  if (dot) dot.style.animation  = aktif ? 'pulse 1s infinite' : 'none';
+}
+
+async function qrKameraBaslat() {
+  try {
+    qrDurumGuncelle('Kamera açılıyor...', 'var(--warning)', true);
+    var constraints = { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } };
+    qrStream = await navigator.mediaDevices.getUserMedia(constraints);
+    var video = document.getElementById('qr-video');
+    video.srcObject = qrStream;
+    await video.play();
+
+    document.getElementById('qr-camera-off').style.display = 'none';
+    document.getElementById('qr-baslat-btn').style.display  = 'none';
+    document.getElementById('qr-durdur-btn').style.display  = 'block';
+    document.getElementById('qr-sonuc-kutu').style.display  = 'none';
+    qrSonucId = null;
+    qrDurumGuncelle('QR kodu kameraya gösterin', 'var(--success)', true);
+
+    // jsQR kütüphanesini yükle ve taramayı başlat
+    if (typeof jsQR === 'undefined') {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+      script.onload = function() { qrTaramaBaslat(); };
+      document.head.appendChild(script);
+    } else {
+      qrTaramaBaslat();
+    }
+  } catch(err) {
+    console.error('Kamera hatası:', err);
+    qrDurumGuncelle('Kamera erişimi reddedildi', 'var(--accent2)', false);
+    showNotif('KAMERA HATASI', 'Kamera izni gerekli.', true);
+  }
+}
+
+function qrTaramaBaslat() {
+  var video  = document.getElementById('qr-video');
+  var canvas = document.getElementById('qr-canvas');
+  var ctx    = canvas.getContext('2d');
+
+  qrScanInterval = setInterval(function() {
+    if (!qrStream || video.readyState !== video.HAVE_ENOUGH_DATA) return;
+    canvas.width  = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    var code = jsQR(imageData.data, imageData.width, imageData.height, { inversionAttempts: 'dontInvert' });
+    if (code && code.data) {
+      qrKodBulundu(code.data);
+    }
+  }, 250);
+}
+
+function qrKodBulundu(data) {
+  // Aynı kodu tekrar tekrar işleme
+  if (qrSonucId === data) return;
+  qrSonucId = data;
+
+  clearInterval(qrScanInterval);
+  qrDurumGuncelle('QR kod okundu!', 'var(--accent)', false);
+
+  // Kayıtlar içinde ara
+  var reg = kayitlar.find(function(r) { return r.id === data || r.qrData === data || r.plate === data; });
+
+  var sonucKutu  = document.getElementById('qr-sonuc-kutu');
+  var sonucPlaka = document.getElementById('qr-sonuc-plaka');
+  var sonucBilgi = document.getElementById('qr-sonuc-bilgi');
+
+  if (reg) {
+    sonucPlaka.textContent = reg.plate;
+    sonucBilgi.textContent = (reg.year||'') + ' ' + (reg.make||'') + ' ' + (reg.model||'') + ' · ' + (reg.owner||'');
+    sonucKutu.style.display = 'block';
+    // Vibrasyon geri bildirimi
+    if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+    showNotif('QR OKUNDU', reg.plate + ' bulundu.');
+  } else {
+    sonucPlaka.textContent = '?';
+    sonucBilgi.textContent = 'Bu QR kodu kayıtlarda bulunamadı: ' + data.substring(0, 40);
+    sonucKutu.style.display = 'block';
+    showNotif('ARAÇ BULUNAMADI', 'Kayıtlarda eşleşme yok.', true);
+  }
+
+  // 3 saniye sonra tekrar taramaya devam et
+  setTimeout(function() {
+    if (qrStream) {
+      qrSonucId = null;
+      qrTaramaBaslat();
+      qrDurumGuncelle('QR kodu kameraya gösterin', 'var(--success)', true);
+    }
+  }, 3000);
+}
+
+function qrKameraDurdur() {
+  clearInterval(qrScanInterval);
+  if (qrStream) {
+    qrStream.getTracks().forEach(function(t) { t.stop(); });
+    qrStream = null;
+  }
+  var video = document.getElementById('qr-video');
+  if (video) video.srcObject = null;
+  document.getElementById('qr-camera-off').style.display = 'flex';
+  document.getElementById('qr-baslat-btn').style.display  = 'block';
+  document.getElementById('qr-durdur-btn').style.display  = 'none';
+  qrDurumGuncelle('Taramak için kamerayı başlatın', 'var(--text-muted)', false);
+}
+
+function qrSonucGecmis() {
+  var reg = kayitlar.find(function(r) {
+    var plaka = document.getElementById('qr-sonuc-plaka').textContent;
+    return r.plate === plaka;
+  });
+  if (reg) { openHistoryModal(reg.id); }
+}
+
+function qrSonucZiyaret() {
+  var reg = kayitlar.find(function(r) {
+    var plaka = document.getElementById('qr-sonuc-plaka').textContent;
+    return r.plate === plaka;
+  });
+  if (reg) {
+    aktifPlakaId = reg.id;
+    qrKameraDurdur();
+    yeniZiyaretBaslat();
+    mobTab('form');
+  }
+}
+
 function showNotif(title, msg, isError) {
   var n = document.getElementById('notification');
   document.getElementById('notif-title').textContent = title;
