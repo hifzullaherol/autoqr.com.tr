@@ -1316,6 +1316,10 @@
         <input type="text" id="hesap-yeni-ad" placeholder="Servis adınız">
       </div>
       <div class="hesap-field">
+        <label>Telefon</label>
+        <input type="tel" id="hesap-yeni-telefon" placeholder="0532 000 00 00" maxlength="14" oninput="formatPhone(this)">
+      </div>
+      <div class="hesap-field">
         <label>Yeni Şifre <span style="color:var(--text-muted); font-size:9px;">(boş bırakırsanız değişmez)</span></label>
         <input type="password" id="hesap-yeni-sifre" placeholder="••••••••" autocomplete="new-password">
       </div>
@@ -1633,8 +1637,9 @@ async function kayitOl() {
 async function servisYukle(userId) {
   var { data } = await sb.from('servisler').select('*').eq('owner_id', userId).single();
   if (data) {
-    mevcutServisId  = data.id;
-    mevcutServisAdi = data.ad;
+    mevcutServisId       = data.id;
+    mevcutServisAdi      = data.ad;
+    mevcutServisTelefon  = data.telefon || '';
     document.getElementById('login-user-label').textContent = data.ad;
     var el = document.getElementById('mob-servis-adi-label');
     if (el) el.textContent = data.ad;
@@ -1720,6 +1725,7 @@ async function cikisYap() {
 const kayitlar = JSON.parse(localStorage.getItem('arac_kayitlari')) || [];
 let   cloudYuklendi = false;
 let   mevcutEmail   = '';
+let   mevcutServisTelefon = '';
 let   mevcutOncelik = 'low';
 let   aktifQR       = null;
 let   aktifAracId   = null;
@@ -2882,6 +2888,7 @@ function hesapAc() {
   var adi = mevcutServisAdi || mevcutEmail || '?';
   avatar.textContent = adi.substring(0, 2).toUpperCase();
   document.getElementById('hesap-yeni-ad').value       = mevcutServisAdi || '';
+  document.getElementById('hesap-yeni-telefon').value  = mevcutServisTelefon || '';
   document.getElementById('hesap-yeni-sifre').value    = '';
   document.getElementById('hesap-sifre-tekrar').value  = '';
   hesapMesajGizle();
@@ -2901,10 +2908,11 @@ function hesapMesajGizle() {
   if (el) el.style.display = 'none';
 }
 async function hesapGuncelle() {
-  var yeniAd      = document.getElementById('hesap-yeni-ad').value.trim();
-  var yeniSifre   = document.getElementById('hesap-yeni-sifre').value;
-  var sifreTekrar = document.getElementById('hesap-sifre-tekrar').value;
-  var btn         = document.getElementById('hesap-kaydet-btn');
+  var yeniAd       = document.getElementById('hesap-yeni-ad').value.trim();
+  var yeniTelefon  = document.getElementById('hesap-yeni-telefon').value.trim();
+  var yeniSifre    = document.getElementById('hesap-yeni-sifre').value;
+  var sifreTekrar  = document.getElementById('hesap-sifre-tekrar').value;
+  var btn          = document.getElementById('hesap-kaydet-btn');
   if (!yeniAd) { hesapMesajGoster('Servis adı boş bırakılamaz.', 'err'); return; }
   if (yeniSifre && yeniSifre.length < 6) { hesapMesajGoster('Şifre en az 6 karakter olmalıdır.', 'err'); return; }
   if (yeniSifre && yeniSifre !== sifreTekrar) { hesapMesajGoster('Şifreler eşleşmiyor.', 'err'); return; }
@@ -2913,9 +2921,11 @@ async function hesapGuncelle() {
   hesapMesajGizle();
   try {
     if (mevcutServisId) {
-      var { error: adHata } = await sb.from('servisler').update({ ad: yeniAd }).eq('id', mevcutServisId);
+      var { error: adHata } = await sb.from('servisler')
+        .update({ ad: yeniAd, telefon: yeniTelefon }).eq('id', mevcutServisId);
       if (adHata) throw adHata;
-      mevcutServisAdi = yeniAd;
+      mevcutServisAdi      = yeniAd;
+      mevcutServisTelefon  = yeniTelefon;
       document.getElementById('login-user-label').textContent = yeniAd;
       document.getElementById('hesap-servis-adi-val').textContent = yeniAd;
       var mobEl = document.getElementById('mob-servis-adi-label');
