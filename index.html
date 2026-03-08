@@ -2818,32 +2818,34 @@ function qrKodBulundu(data) {
   // Kayıtlar içinde ara
   var reg = kayitlar.find(function(r) { return r.id === data || r.qrData === data || r.plate === data; });
 
-  var sonucKutu  = document.getElementById('qr-sonuc-kutu');
-  var sonucPlaka = document.getElementById('qr-sonuc-plaka');
-  var sonucBilgi = document.getElementById('qr-sonuc-bilgi');
-
   if (reg) {
-    sonucPlaka.textContent = reg.plate;
-    sonucBilgi.textContent = (reg.year||'') + ' ' + (reg.make||'') + ' ' + (reg.model||'') + ' · ' + (reg.owner||'');
-    sonucKutu.style.display = 'block';
+    // Kamerayı durdur
+    qrKameraDurdur();
     // Vibrasyon geri bildirimi
     if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
     showNotif('QR OKUNDU', reg.plate + ' bulundu.');
+    // Doğrudan QR GÖSTER sekmesine geç, araç bilgisini göster
+    mobilQREkrani(reg);
   } else {
+    // Araç bulunamadı — sonuç kutusunu TARA panelinde göster
+    var sonucKutu  = document.getElementById('qr-sonuc-kutu');
+    var sonucPlaka = document.getElementById('qr-sonuc-plaka');
+    var sonucBilgi = document.getElementById('qr-sonuc-bilgi');
     sonucPlaka.textContent = '?';
     sonucBilgi.textContent = 'Bu QR kodu kayıtlarda bulunamadı: ' + data.substring(0, 40);
     sonucKutu.style.display = 'block';
     showNotif('ARAÇ BULUNAMADI', 'Kayıtlarda eşleşme yok.', true);
-  }
 
-  // 3 saniye sonra tekrar taramaya devam et
-  setTimeout(function() {
-    if (qrStream) {
-      qrSonucId = null;
-      qrTaramaBaslat();
-      qrDurumGuncelle('QR kodu kameraya gösterin', 'var(--success)', true);
-    }
-  }, 3000);
+    // 3 saniye sonra tekrar taramaya devam et
+    setTimeout(function() {
+      if (qrStream) {
+        qrSonucId = null;
+        sonucKutu.style.display = 'none';
+        qrTaramaBaslat();
+        qrDurumGuncelle('QR kodu kameraya gösterin', 'var(--success)', true);
+      }
+    }, 3000);
+  }
 }
 
 function qrSonucQRGoster() {
