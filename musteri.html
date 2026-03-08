@@ -571,7 +571,14 @@ async function yukle() {
       .order('created_at', { ascending: false });
     ziyaretler = vData || [];
 
-    goster(arac, ziyaretler);
+    // Servis telefonu çek
+    var servisTelefon = '';
+    if (arac.servis_id) {
+      var { data: servisData } = await sb.from('servisler').select('telefon, ad').eq('id', arac.servis_id).single();
+      if (servisData) servisTelefon = servisData.telefon || '';
+    }
+
+    goster(arac, ziyaretler, servisTelefon);
 
   } catch(err) {
     showError('KAYIT BULUNAMADI', 'Bu QR koda ait servis kaydı bulunamadı. Servis personeliyle iletişime geçin.');
@@ -579,7 +586,7 @@ async function yukle() {
   }
 }
 
-function goster(arac, ziyaretler) {
+function goster(arac, ziyaretler, servisTelefon) {
   document.getElementById('loading').style.display = 'none';
 
   // Araç bilgileri
@@ -588,6 +595,15 @@ function goster(arac, ziyaretler) {
   document.getElementById('meta-sahip').textContent  = arac.owner || '—';
   document.getElementById('meta-ziyaret').textContent = ziyaretler.length + ' ziyaret';
   document.getElementById('meta-son').textContent    = ziyaretler[0] ? (ziyaretler[0].timestamp || '—') : '—';
+
+  // Arama butonunu telefon numarasıyla güncelle
+  var callBtn = document.querySelector('.call-btn');
+  if (servisTelefon) {
+    callBtn.href = 'tel:' + servisTelefon.replace(/\s/g, '');
+    callBtn.style.display = '';
+  } else {
+    callBtn.style.display = 'none';
+  }
 
   // Aksiyon butonlarını göster
   document.getElementById('action-btns').style.display = 'flex';
@@ -740,8 +756,15 @@ async function yukleQR(qrData) {
       .select('*').eq('arac_id', arac.id)
       .order('created_at', { ascending: false });
 
+    // Servis telefonu çek
+    var servisTelefon = '';
+    if (arac.servis_id) {
+      var { data: servisData } = await sb.from('servisler').select('telefon, ad').eq('id', arac.servis_id).single();
+      if (servisData) servisTelefon = servisData.telefon || '';
+    }
+
     document.getElementById('loading').style.display = 'none';
-    goster(arac, ziyaretler || []);
+    goster(arac, ziyaretler || [], servisTelefon);
 
     // Tekrar tara butonu ekle
     if (!document.getElementById('tekrar-btn')) {
