@@ -1144,6 +1144,7 @@
         <div id="qr-sonuc-bilgi" style="font-size:12px; color:var(--text-dim); margin:6px 0 12px;"></div>
         <div style="display:flex; gap:8px;">
           <button onclick="qrSonucGecmis()" style="flex:1; padding:10px; background:rgba(232,255,71,0.08); border:1px solid var(--accent); color:var(--accent); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1px; cursor:pointer; border-radius:6px; text-transform:uppercase;">📋 GEÇMİŞ</button>
+          <button onclick="qrSonucQRGoster()" style="flex:1; padding:10px; background:rgba(232,255,71,0.08); border:1px solid var(--accent); color:var(--accent); font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1px; cursor:pointer; border-radius:6px; text-transform:uppercase;">⬛ QR GÖR</button>
           <button onclick="qrSonucZiyaret()" style="flex:1; padding:10px; background:var(--accent2); border:none; color:white; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1px; cursor:pointer; border-radius:6px; text-transform:uppercase;">＋ ZİYARET</button>
         </div>
       </div>
@@ -2845,6 +2846,13 @@ function qrKodBulundu(data) {
   }, 3000);
 }
 
+function qrSonucQRGoster() {
+  var plaka = document.getElementById('qr-sonuc-plaka').textContent;
+  var reg = kayitlar.find(function(r) { return r.plate === plaka; });
+  if (!reg) return;
+  mobilQREkrani(reg);
+}
+
 function qrKameraDurdur() {
   clearInterval(qrScanInterval);
   if (qrStream) {
@@ -2854,7 +2862,6 @@ function qrKameraDurdur() {
   var video = document.getElementById('qr-video');
   if (video) video.srcObject = null;
   document.getElementById('qr-camera-off').style.display = 'flex';
-  document.getElementById('qr-baslat-btn').style.display  = 'block';
   document.getElementById('qr-durdur-btn').style.display  = 'none';
   qrDurumGuncelle('Taramak için kamerayı başlatın', 'var(--text-muted)', false);
 }
