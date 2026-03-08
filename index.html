@@ -974,20 +974,6 @@
   <!-- EKRAN 3: QR OKUYUCU + GÖRÜNTÜLE -->
   <div class="mob-ekran" id="mob-qr-ekrani">
 
-    <!-- SEKMELİ BAŞLIK -->
-    <div style="display:flex; gap:0; margin-bottom:16px; border:1px solid var(--border); border-radius:8px; overflow:hidden;">
-      <button id="qr-tab-tara" onclick="qrTabSec('tara')"
-        style="flex:1; padding:11px; background:var(--accent); border:none; color:var(--bg);
-        font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; cursor:pointer; font-weight:700;">
-        📷 QR TARA
-      </button>
-      <button id="qr-tab-goster" onclick="qrTabSec('goster')"
-        style="flex:1; padding:11px; background:var(--surface); border:none; color:var(--text-dim);
-        font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; cursor:pointer;">
-        ⬛ QR GÖSTER
-      </button>
-    </div>
-
     <!-- TARAYICI PANELİ -->
     <div id="qr-panel-tara">
       <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:14px;">
@@ -1007,7 +993,7 @@
           <!-- Kamera kapalı overlay -->
           <div id="qr-camera-off" style="position:absolute; inset:0; background:var(--surface); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;">
             <div style="font-size:48px; opacity:0.3;">📷</div>
-            <div style="font-size:11px; color:var(--text-muted); letter-spacing:2px; text-align:center;">KAMERA KAPALI</div>
+            <div style="font-size:11px; color:var(--text-muted); letter-spacing:2px; text-align:center;">KAMERA AÇILIYOR...</div>
           </div>
         </div>
         <div style="padding:14px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
@@ -1016,12 +1002,7 @@
         </div>
       </div>
 
-      <button id="qr-baslat-btn" onclick="qrKameraBaslat()"
-        style="width:100%; padding:14px; background:var(--accent); border:none; color:var(--bg);
-        font-family:'Barlow Condensed',sans-serif; font-size:17px; font-weight:700;
-        letter-spacing:3px; cursor:pointer; border-radius:8px; margin-bottom:10px;">
-        📷 KAMERAYI BAŞLAT
-      </button>
+      <button id="qr-baslat-btn" onclick="qrKameraBaslat()" style="display:none;"></button>
       <button id="qr-durdur-btn" onclick="qrKameraDurdur()" style="display:none;
         width:100%; padding:14px; background:transparent; border:1px solid var(--border); color:var(--text-dim);
         font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700;
@@ -1039,6 +1020,13 @@
         </div>
       </div>
     </div>
+
+    <!-- Göster butonu -->
+    <button onclick="qrTabSec('goster')"
+      style="width:100%; padding:10px; background:transparent; border:1px solid var(--border); color:var(--text-dim);
+      font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; cursor:pointer; border-radius:6px; margin-bottom:10px; text-transform:uppercase;">
+      ⬛ Son Kaydın QR Kodunu Göster
+    </button>
 
     <!-- QR GÖSTER PANELİ -->
     <div id="qr-panel-goster" style="display:none;">
@@ -1210,7 +1198,8 @@ function mobTab(tab) {
   });
   if (tab === 'form')  { mobFormHazirla(); }
   if (tab === 'liste') { mobListeYenile(); }
-  if (tab !== 'qr') { qrKameraDurdur && qrKameraDurdur(); }
+  if (tab === 'qr')    { setTimeout(function(){ qrKameraBaslat(); }, 200); }
+  if (tab !== 'qr')    { if (typeof qrKameraDurdur === 'function') qrKameraDurdur(); }
 }
 
 /* Eski isimlerle uyumluluk */
@@ -2548,12 +2537,7 @@ function qrTabSec(tab) {
   if (tab === 'tara') {
     panelTara.style.display   = 'block';
     panelGoster.style.display = 'none';
-    tabTara.style.background  = 'var(--accent)';
-    tabTara.style.color       = 'var(--bg)';
-    tabTara.style.fontWeight  = '700';
-    tabGoster.style.background = 'var(--surface)';
-    tabGoster.style.color     = 'var(--text-dim)';
-    tabGoster.style.fontWeight = '400';
+    qrKameraBaslat();
   } else {
     panelTara.style.display   = 'none';
     panelGoster.style.display = 'block';
@@ -2576,8 +2560,13 @@ function qrDurumGuncelle(msg, renk, aktif) {
 }
 
 async function qrKameraBaslat() {
+  // Zaten açıksa tekrar başlatma
+  if (qrStream && qrStream.active) return;
+
   try {
     qrDurumGuncelle('Kamera açılıyor...', 'var(--warning)', true);
+    document.getElementById('qr-camera-off').style.display = 'flex';
+
     var constraints = { video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } } };
     qrStream = await navigator.mediaDevices.getUserMedia(constraints);
     var video = document.getElementById('qr-video');
@@ -2585,7 +2574,6 @@ async function qrKameraBaslat() {
     await video.play();
 
     document.getElementById('qr-camera-off').style.display = 'none';
-    document.getElementById('qr-baslat-btn').style.display  = 'none';
     document.getElementById('qr-durdur-btn').style.display  = 'block';
     document.getElementById('qr-sonuc-kutu').style.display  = 'none';
     qrSonucId = null;
@@ -2602,8 +2590,9 @@ async function qrKameraBaslat() {
     }
   } catch(err) {
     console.error('Kamera hatası:', err);
-    qrDurumGuncelle('Kamera erişimi reddedildi', 'var(--accent2)', false);
-    showNotif('KAMERA HATASI', 'Kamera izni gerekli.', true);
+    var offDiv = document.getElementById('qr-camera-off');
+    if (offDiv) offDiv.innerHTML = '<div style="font-size:36px; opacity:0.5;">🚫</div><div style="font-size:11px; color:var(--accent2); letter-spacing:1px; text-align:center; padding:0 20px;">Kamera izni verilmedi.<br>Tarayıcı ayarlarından izin verin.</div>';
+    qrDurumGuncelle('Kamera izni gerekli', 'var(--accent2)', false);
   }
 }
 
