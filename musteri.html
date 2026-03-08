@@ -136,48 +136,54 @@
     margin-top:6px; letter-spacing:1px;
   }
 
-  /* ── HIZLI ARAMA BUTONU ── */
-  .call-btn {
+  /* ── AKSİYON BUTONLARI ── */
+  .action-btns {
+    display: none;
+    gap: 10px;
+    margin-bottom: 20px;
+    animation: fadeUp 0.4s ease 0.1s both;
+  }
+  .call-btn, .map-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 15px 20px;
-    margin-bottom: 20px;
-    background: linear-gradient(135deg, #22c55e, #16a34a);
+    gap: 8px;
+    flex: 1;
+    padding: 14px 12px;
     border: none;
     border-radius: 10px;
     color: #fff;
     font-family: 'Barlow Condensed', sans-serif;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
     text-decoration: none;
     cursor: pointer;
-    box-shadow: 0 4px 20px rgba(34,197,94,0.3);
-    animation: fadeUp 0.4s ease 0.1s both;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
     position: relative;
     overflow: hidden;
   }
-  .call-btn::before {
+  .call-btn {
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow: 0 4px 16px rgba(34,197,94,0.3);
+  }
+  .map-btn {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    box-shadow: 0 4px 16px rgba(59,130,246,0.3);
+  }
+  .call-btn::before, .map-btn::before {
     content: '';
     position: absolute;
     inset: 0;
     background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
     pointer-events: none;
   }
-  .call-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(34,197,94,0.45);
-  }
-  .call-btn:active {
-    transform: translateY(0);
-  }
+  .call-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(34,197,94,0.45); }
+  .map-btn:hover  { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(59,130,246,0.45); }
+  .call-btn:active, .map-btn:active { transform: translateY(0); }
   .call-btn .phone-icon {
-    font-size: 22px;
+    font-size: 20px;
     animation: ringPhone 2.5s ease infinite;
   }
   @keyframes ringPhone {
@@ -187,8 +193,8 @@
     15%      { transform: rotate(-15deg); }
     20%      { transform: rotate(0deg); }
   }
-  .call-btn .call-sub {
-    font-size: 10px;
+  .btn-sub {
+    font-size: 9px;
     font-family: 'IBM Plex Mono', monospace;
     font-weight: 400;
     letter-spacing: 1px;
@@ -437,14 +443,23 @@
     <div class="error-msg" id="error-msg">Bu QR koda ait servis kaydı bulunamadı.<br>Lütfen servis personeliyle iletişime geçin.</div>
   </div>
 
-  <!-- Hızlı Arama Butonu -->
-  <a class="call-btn" id="call-btn" href="tel:+905324567890" style="display:none;">
-    <span class="phone-icon">📞</span>
-    <span>
-      SERVİSİ ARA
-      <span class="call-sub">Pamukova Erol Ticaret</span>
-    </span>
-  </a>
+  <!-- Aksiyon Butonları -->
+  <div class="action-btns" id="action-btns" style="display:none;">
+    <a class="call-btn" href="tel:+905324567890">
+      <span class="phone-icon">📞</span>
+      <span>
+        ARA
+        <span class="btn-sub">Pamukova Erol Ticaret</span>
+      </span>
+    </a>
+    <a class="map-btn" href="https://maps.google.com/?q=Pamukova+Erol+Ticaret,+Pamukova,+Sakarya" target="_blank">
+      <span style="font-size:20px;">📍</span>
+      <span>
+        HARİTA
+        <span class="btn-sub">Yol Tarifi Al</span>
+      </span>
+    </a>
+  </div>
 
   <!-- Araç Bilgisi -->
   <div class="arac-card" id="arac-card">
@@ -574,8 +589,8 @@ function goster(arac, ziyaretler) {
   document.getElementById('meta-ziyaret').textContent = ziyaretler.length + ' ziyaret';
   document.getElementById('meta-son').textContent    = ziyaretler[0] ? (ziyaretler[0].timestamp || '—') : '—';
 
-  // Hızlı Arama butonunu göster
-  document.getElementById('call-btn').style.display = 'flex';
+  // Aksiyon butonlarını göster
+  document.getElementById('action-btns').style.display = 'flex';
 
   document.getElementById('arac-card').style.display = 'block';
 
