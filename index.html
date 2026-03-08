@@ -1082,11 +1082,27 @@
     <!-- panel-left DOM'dan buraya move edilir, boş başlar -->
   </div>
 
-  <!-- EKRAN 3: QR OKUYUCU + GÖRÜNTÜLE -->
-  <div class="mob-ekran" id="mob-qr-ekrani">
+  <!-- EKRAN 3: QR KOD (Okuyucu + Göster sekmeleri) -->
+  <div class="mob-ekran" id="mob-qr-ekrani" style="padding:0;">
 
-    <!-- TARAYICI PANELİ -->
-    <div id="qr-panel-tara">
+    <!-- SEKMELİ BAŞLIK -->
+    <div style="display:flex; border-bottom:1px solid var(--border); background:var(--surface); flex-shrink:0;">
+      <button id="mob-qr-tab-tara" onclick="mobQrTabSec('tara')"
+        style="flex:1; padding:14px 8px; border:none; background:var(--accent); color:var(--bg);
+        font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px;
+        font-weight:700; cursor:pointer; text-transform:uppercase; border-bottom:2px solid var(--accent);">
+        📷 QR TARA
+      </button>
+      <button id="mob-qr-tab-goster" onclick="mobQrTabSec('goster')"
+        style="flex:1; padding:14px 8px; border:none; background:var(--surface); color:var(--text-dim);
+        font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px;
+        cursor:pointer; text-transform:uppercase; border-bottom:2px solid transparent;">
+        ⬛ QR GÖSTER
+      </button>
+    </div>
+
+    <!-- TARA PANELİ -->
+    <div id="qr-panel-tara" style="padding:14px; overflow-y:auto; flex:1;">
       <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:14px;">
         <div style="position:relative; width:100%; aspect-ratio:1/1; background:#000;">
           <video id="qr-video" style="width:100%; height:100%; object-fit:cover; display:block;" playsinline muted></video>
@@ -1132,15 +1148,8 @@
       </div>
     </div>
 
-    <!-- Göster butonu -->
-    <button onclick="qrTabSec('goster')"
-      style="width:100%; padding:10px; background:transparent; border:1px solid var(--border); color:var(--text-dim);
-      font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; cursor:pointer; border-radius:6px; margin-bottom:10px; text-transform:uppercase;">
-      ⬛ Son Kaydın QR Kodunu Göster
-    </button>
-
-    <!-- QR GÖSTER PANELİ -->
-    <div id="qr-panel-goster" style="display:none;">
+    <!-- GÖSTER PANELİ -->
+    <div id="qr-panel-goster" style="display:none; padding:14px; overflow-y:auto; flex:1;">
       <div class="mob-qr-kutu">
         <div class="mob-qr-plaka" id="mob-qr-plaka-txt">—</div>
         <div class="mob-qr-alt"   id="mob-qr-alt-txt">—</div>
@@ -1357,7 +1366,7 @@ function mobTab(tab) {
   });
   if (tab === 'form')  { mobFormHazirla(); }
   if (tab === 'liste') { mobListeYenile(); }
-  if (tab === 'qr')    { setTimeout(function(){ qrKameraBaslat(); }, 200); }
+  if (tab === 'qr')    { setTimeout(function(){ mobQrTabSec('tara'); }, 200); }
   if (tab !== 'qr')    { if (typeof qrKameraDurdur === 'function') qrKameraDurdur(); }
 }
 
@@ -1400,6 +1409,7 @@ function mobilQREkrani(kayit) {
   });
 
   mobTab('qr');
+  setTimeout(function(){ mobQrTabSec('goster'); }, 250);
 }
 
 /* ── Araç listesini yenile ── */
@@ -2690,27 +2700,41 @@ var qrStream = null;
 var qrScanInterval = null;
 var qrSonucId = null;
 
-function qrTabSec(tab) {
+function mobQrTabSec(tab) {
   var panelTara   = document.getElementById('qr-panel-tara');
   var panelGoster = document.getElementById('qr-panel-goster');
-  var tabTara     = document.getElementById('qr-tab-tara');
-  var tabGoster   = document.getElementById('qr-tab-goster');
+  var tabTara     = document.getElementById('mob-qr-tab-tara');
+  var tabGoster   = document.getElementById('mob-qr-tab-goster');
 
   if (tab === 'tara') {
     panelTara.style.display   = 'block';
     panelGoster.style.display = 'none';
+    tabTara.style.background  = 'var(--accent)';
+    tabTara.style.color       = 'var(--bg)';
+    tabTara.style.fontWeight  = '700';
+    tabTara.style.borderBottom = '2px solid var(--accent)';
+    tabGoster.style.background = 'var(--surface)';
+    tabGoster.style.color      = 'var(--text-dim)';
+    tabGoster.style.fontWeight = '400';
+    tabGoster.style.borderBottom = '2px solid transparent';
     qrKameraBaslat();
   } else {
     panelTara.style.display   = 'none';
     panelGoster.style.display = 'block';
     tabGoster.style.background = 'var(--accent)';
-    tabGoster.style.color     = 'var(--bg)';
+    tabGoster.style.color      = 'var(--bg)';
     tabGoster.style.fontWeight = '700';
+    tabGoster.style.borderBottom = '2px solid var(--accent)';
     tabTara.style.background  = 'var(--surface)';
     tabTara.style.color       = 'var(--text-dim)';
     tabTara.style.fontWeight  = '400';
+    tabTara.style.borderBottom = '2px solid transparent';
     qrKameraDurdur();
   }
+}
+
+function qrTabSec(tab) {
+  mobQrTabSec(tab);
 }
 
 function qrDurumGuncelle(msg, renk, aktif) {
