@@ -234,6 +234,43 @@
 
   .service-name { font-size: 13px; font-weight: 500; }
 
+  /* Periyodik Bakim Alt Secenekleri */
+  .periodik-alt {
+    display: none;
+    grid-column: 1 / -1;
+    background: rgba(232,255,71,0.04);
+    border: 1px solid rgba(232,255,71,0.2);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    padding: 10px 12px;
+    gap: 8px;
+    flex-direction: column;
+    animation: fadeIn 0.2s ease;
+    margin-top: -10px;
+  }
+  .periodik-alt.acik { display: flex; }
+  .periodik-alt-item { display: flex; align-items: center; gap: 8px; }
+  .periodik-alt-check {
+    width: 14px; height: 14px; flex-shrink: 0;
+    border: 1px solid var(--border); border-radius: 2px;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; color: var(--bg); font-weight: 700;
+  }
+  .periodik-alt-check.secili { background: var(--accent); border-color: var(--accent); }
+  .periodik-alt-check.secili::after { content: '\2713'; }
+  .periodik-alt-label {
+    font-size: 11px; color: var(--text-dim);
+    width: 75px; flex-shrink: 0; cursor: pointer;
+  }
+  .periodik-alt-not {
+    flex: 1; background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text); font-family: "IBM Plex Mono", monospace;
+    font-size: 11px; padding: 5px 8px; border-radius: 3px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .periodik-alt-not:focus { border-color: var(--accent); }
+
   .urgency-row { display: flex; gap: 10px; margin-bottom: 20px; }
 
   .urgency-btn {
@@ -1738,12 +1775,9 @@ const seciliServisler = new Set();
 
 // ── SERVİS LİSTESİ ────────────────────────────────────
 const SERVISLER = [
-  'Yağ Değişimi',      'Lastik Rotasyonu',
-  'Fren Kontrolü',     'Motor Diagnostiği',
-  'Hava Filtresi',     'Akü Kontrolü',
-  'Şanzıman Servisi',  'Klima Servisi',
-  'Rot-Balans',        'Tam Servis',
-  'Antifriz Değişimi', 'Süspansiyon Kontrolü'
+  'Periyodik Bakım',
+  'Ön Takım',
+  'Fren Servisi'
 ];
 
 // ── SAYFA HAZIR ───────────────────────────────────────
@@ -1797,22 +1831,278 @@ window.onload = function() {
 
   // Servis kartlarını oluştur
   var grid = document.getElementById('services-grid');
+  var PERIODIK_ALT_SECENEKLER = [
+    { id: 'yag-filtresi',   ad: 'Yağ F.' },
+    { id: 'hava-filtresi',  ad: 'Hava F.' },
+    { id: 'polen-filtresi', ad: 'Polen F.' },
+    { id: 'yakit-filtresi', ad: 'Yakıt F.' }
+  ];
+
+  var FREN_ALT_SECENEKLER = [
+    { id: 'fren-pedali',        ad: 'Fren Pedalı' },
+    { id: 'fren-servosu',       ad: 'Fren Servosu' },
+    { id: 'fren-ana-merkezi',   ad: 'Ana Merkez' },
+    { id: 'fren-hidro-sivi',    ad: 'Hidrolik Sıvı' },
+    { id: 'fren-boru-hortum',   ad: 'Boru/Hortum' },
+    { id: 'fren-diski',         ad: 'Fren Diski' },
+    { id: 'fren-kaliper',       ad: 'Fren Kaliperi' },
+    { id: 'fren-balata',        ad: 'Fren Balatası' },
+    { id: 'fren-kampana',       ad: 'Fren Kampanası' },
+    { id: 'tekerlek-silindiri', ad: 'Teker Silindiri' },
+    { id: 'abs-modulu',         ad: 'ABS Modülü' },
+    { id: 'el-freni',           ad: 'El Freni' }
+  ];
+
+  var ON_TAKIM_ALT_SECENEKLER = [
+    { id: 'rot-basi',         ad: 'Rot Başı' },
+    { id: 'rotil',            ad: 'Rotil' },
+    { id: 'z-rot',            ad: 'Z Rot' },
+    { id: 'amortisör',        ad: 'Amortisör' },
+    { id: 'ust-takoz',        ad: 'Üst Takoz' },
+    { id: 'salincak',         ad: 'Salıncak' },
+    { id: 'aks',              ad: 'Aks' },
+    { id: 'porya',            ad: 'Porya' },
+    { id: 'bilya',            ad: 'Bilya' },
+    { id: 'viraj-denge',      ad: 'Viraj Denge Çubuğu' },
+    { id: 'direksiyon-kutusu',ad: 'Direksiyon Kutusu' }
+  ];
+
   SERVISLER.forEach(function(servis) {
     var div = document.createElement('div');
     div.className  = 'service-item';
     div.dataset.ad = servis;
-    div.innerHTML  = '<div class="service-check"></div><div class="service-name">' + servis + '</div>';
-    div.addEventListener('click', function() {
-      var ad = this.dataset.ad;
-      if (seciliServisler.has(ad)) {
-        seciliServisler.delete(ad);
-        this.classList.remove('checked');
-      } else {
-        seciliServisler.add(ad);
-        this.classList.add('checked');
-      }
-    });
-    grid.appendChild(div);
+
+    var isPeriodik    = (servis === 'Periyodik Bakım');
+    var isOnTakim     = (servis === 'Ön Takım');
+    var isFrenServisi = (servis === 'Fren Servisi');
+
+    if (isPeriodik) {
+      div.style.borderRadius = '6px 6px 0 0';
+      div.style.gridColumn = '1 / -1';
+      div.innerHTML = '<div class="service-check"></div>'
+        + '<div class="service-name">' + servis + '</div>'
+        + '<div id="periodik-ok" style="margin-left:auto;font-size:10px;color:var(--text-muted);transition:transform 0.3s;">▼</div>';
+
+      div.addEventListener('click', function() {
+        var altDiv = document.getElementById('periodik-alt-panel');
+        var ok = document.getElementById('periodik-ok');
+        var acik = altDiv.classList.contains('acik');
+        if (acik) {
+          altDiv.classList.remove('acik');
+          this.classList.remove('checked');
+          if (ok) ok.style.transform = '';
+        } else {
+          altDiv.classList.add('acik');
+          this.classList.add('checked');
+          if (ok) ok.style.transform = 'rotate(180deg)';
+        }
+      });
+      grid.appendChild(div);
+
+      // Alt panel
+      var altDiv = document.createElement('div');
+      altDiv.className = 'periodik-alt';
+      altDiv.id = 'periodik-alt-panel';
+
+      PERIODIK_ALT_SECENEKLER.forEach(function(alt) {
+        var item = document.createElement('div');
+        item.className = 'periodik-alt-item';
+
+        var chk = document.createElement('div');
+        chk.className = 'periodik-alt-check';
+        chk.id = 'chk-' + alt.id;
+
+        var lbl = document.createElement('span');
+        lbl.className = 'periodik-alt-label';
+        lbl.textContent = alt.ad;
+
+        var notInput = document.createElement('input');
+        notInput.className = 'periodik-alt-not';
+        notInput.id = 'not-' + alt.id;
+        notInput.placeholder = 'Not ekle...';
+        notInput.type = 'text';
+        notInput.addEventListener('click', function(e) { e.stopPropagation(); });
+        notInput.addEventListener('focus', function(e) { e.stopPropagation(); });
+
+        (function(altId) {
+          function toggle() {
+            var c = document.getElementById('chk-' + altId);
+            if (c.classList.contains('secili')) {
+              c.classList.remove('secili');
+              seciliServisler.delete('periodik:' + altId);
+            } else {
+              c.classList.add('secili');
+              seciliServisler.add('periodik:' + altId);
+            }
+          }
+          chk.addEventListener('click', function(e) { e.stopPropagation(); toggle(); });
+          lbl.addEventListener('click', function(e) { e.stopPropagation(); toggle(); });
+        })(alt.id);
+
+        item.appendChild(chk);
+        item.appendChild(lbl);
+        item.appendChild(notInput);
+        altDiv.appendChild(item);
+      });
+
+      grid.appendChild(altDiv);
+
+    } else if (isOnTakim) {
+      div.style.borderRadius = '6px 6px 0 0';
+      div.style.gridColumn = '1 / -1';
+      div.innerHTML = '<div class="service-check"></div>'
+        + '<div class="service-name">' + servis + '</div>'
+        + '<div id="ontakim-ok" style="margin-left:auto;font-size:10px;color:var(--text-muted);transition:transform 0.3s;">▼</div>';
+
+      div.addEventListener('click', function() {
+        var altDiv = document.getElementById('ontakim-alt-panel');
+        var ok = document.getElementById('ontakim-ok');
+        var acik = altDiv.classList.contains('acik');
+        if (acik) {
+          altDiv.classList.remove('acik');
+          this.classList.remove('checked');
+          if (ok) ok.style.transform = '';
+        } else {
+          altDiv.classList.add('acik');
+          this.classList.add('checked');
+          if (ok) ok.style.transform = 'rotate(180deg)';
+        }
+      });
+      grid.appendChild(div);
+
+      var altDivOT = document.createElement('div');
+      altDivOT.className = 'periodik-alt';
+      altDivOT.id = 'ontakim-alt-panel';
+
+      ON_TAKIM_ALT_SECENEKLER.forEach(function(alt) {
+        var item = document.createElement('div');
+        item.className = 'periodik-alt-item';
+
+        var chk = document.createElement('div');
+        chk.className = 'periodik-alt-check';
+        chk.id = 'chk-' + alt.id;
+
+        var lbl = document.createElement('span');
+        lbl.className = 'periodik-alt-label';
+        lbl.style.width = '140px';
+        lbl.textContent = alt.ad;
+
+        var notInput = document.createElement('input');
+        notInput.className = 'periodik-alt-not';
+        notInput.id = 'not-' + alt.id;
+        notInput.placeholder = 'Not ekle...';
+        notInput.type = 'text';
+        notInput.addEventListener('click', function(e) { e.stopPropagation(); });
+        notInput.addEventListener('focus', function(e) { e.stopPropagation(); });
+
+        (function(altId) {
+          function toggle() {
+            var c = document.getElementById('chk-' + altId);
+            if (c.classList.contains('secili')) {
+              c.classList.remove('secili');
+              seciliServisler.delete('ontakim:' + altId);
+            } else {
+              c.classList.add('secili');
+              seciliServisler.add('ontakim:' + altId);
+            }
+          }
+          chk.addEventListener('click', function(e) { e.stopPropagation(); toggle(); });
+          lbl.addEventListener('click', function(e) { e.stopPropagation(); toggle(); });
+        })(alt.id);
+
+        item.appendChild(chk);
+        item.appendChild(lbl);
+        item.appendChild(notInput);
+        altDivOT.appendChild(item);
+      });
+
+      grid.appendChild(altDivOT);
+
+    } else if (isFrenServisi) {
+      div.style.borderRadius = '6px 6px 0 0';
+      div.style.gridColumn = '1 / -1';
+      div.innerHTML = '<div class="service-check"></div>'
+        + '<div class="service-name">' + servis + '</div>'
+        + '<div id="fren-ok" style="margin-left:auto;font-size:10px;color:var(--text-muted);transition:transform 0.3s;">▼</div>';
+
+      div.addEventListener('click', function() {
+        var altDiv = document.getElementById('fren-alt-panel');
+        var ok = document.getElementById('fren-ok');
+        var acik = altDiv.classList.contains('acik');
+        if (acik) {
+          altDiv.classList.remove('acik');
+          this.classList.remove('checked');
+          if (ok) ok.style.transform = '';
+        } else {
+          altDiv.classList.add('acik');
+          this.classList.add('checked');
+          if (ok) ok.style.transform = 'rotate(180deg)';
+        }
+      });
+      grid.appendChild(div);
+
+      var altDivFren = document.createElement('div');
+      altDivFren.className = 'periodik-alt';
+      altDivFren.id = 'fren-alt-panel';
+
+      FREN_ALT_SECENEKLER.forEach(function(alt) {
+        var item = document.createElement('div');
+        item.className = 'periodik-alt-item';
+
+        var chk = document.createElement('div');
+        chk.className = 'periodik-alt-check';
+        chk.id = 'chk-' + alt.id;
+
+        var lbl = document.createElement('span');
+        lbl.className = 'periodik-alt-label';
+        lbl.style.width = '130px';
+        lbl.textContent = alt.ad;
+
+        var notInput = document.createElement('input');
+        notInput.className = 'periodik-alt-not';
+        notInput.id = 'not-' + alt.id;
+        notInput.placeholder = 'Not ekle...';
+        notInput.type = 'text';
+        notInput.addEventListener('click', function(e) { e.stopPropagation(); });
+        notInput.addEventListener('focus', function(e) { e.stopPropagation(); });
+
+        (function(altId) {
+          function toggle() {
+            var c = document.getElementById('chk-' + altId);
+            if (c.classList.contains('secili')) {
+              c.classList.remove('secili');
+              seciliServisler.delete('fren:' + altId);
+            } else {
+              c.classList.add('secili');
+              seciliServisler.add('fren:' + altId);
+            }
+          }
+          chk.addEventListener('click', function(e) { e.stopPropagation(); toggle(); });
+          lbl.addEventListener('click', function(e) { e.stopPropagation(); toggle(); });
+        })(alt.id);
+
+        item.appendChild(chk);
+        item.appendChild(lbl);
+        item.appendChild(notInput);
+        altDivFren.appendChild(item);
+      });
+
+      grid.appendChild(altDivFren);
+
+    } else {
+      div.innerHTML = '<div class="service-check"></div><div class="service-name">' + servis + '</div>';
+      div.addEventListener('click', function() {
+        var ad = this.dataset.ad;
+        if (seciliServisler.has(ad)) {
+          seciliServisler.delete(ad);
+          this.classList.remove('checked');
+        } else {
+          seciliServisler.add(ad);
+          this.classList.add('checked');
+        }
+      });
+      grid.appendChild(div);
+    }
   });
 
   renderVehicleList();
@@ -2017,7 +2307,8 @@ function updatePreview() {
 // ── KAYIT OLUŞTUR ─────────────────────────────────────
 function generateRegistration() {
   // Servis kontrolü
-  if (seciliServisler.size === 0) {
+  var gercekSecim = Array.from(seciliServisler).filter(function(s){ return s !== 'Periyodik Bakım' && s !== 'Ön Takım' && s !== 'Fren Servisi'; });
+  if (gercekSecim.length === 0) {
     showNotif('SERVİS SEÇİN', 'En az bir servis seçilmelidir.', true);
     return;
   }
@@ -2042,7 +2333,46 @@ function generateRegistration() {
   var dropoff = document.getElementById('dropoff').value;
   var pickup  = document.getElementById('pickup').value;
 
-  var services  = Array.from(seciliServisler);
+  // Servis listesi: periyodik alt seçeneklerini notlarıyla birleştir
+  var adMapPeriodik = {
+    'yag-filtresi': 'Yağ F.', 'hava-filtresi': 'Hava F.',
+    'polen-filtresi': 'Polen F.', 'yakit-filtresi': 'Yakıt F.'
+  };
+  var adMapOnTakim = {
+    'rot-basi': 'Rot Başı', 'rotil': 'Rotil', 'z-rot': 'Z Rot',
+    'amortisör': 'Amortisör', 'ust-takoz': 'Üst Takoz', 'salincak': 'Salıncak',
+    'aks': 'Aks', 'porya': 'Porya', 'bilya': 'Bilya',
+    'viraj-denge': 'Viraj Denge Çubuğu', 'direksiyon-kutusu': 'Direksiyon Kutusu'
+  };
+  var adMapFren = {
+    'fren-pedali': 'Fren Pedalı', 'fren-servosu': 'Fren Servosu',
+    'fren-ana-merkezi': 'Ana Merkez', 'fren-hidro-sivi': 'Hidrolik Sıvı',
+    'fren-boru-hortum': 'Boru/Hortum', 'fren-diski': 'Fren Diski',
+    'fren-kaliper': 'Fren Kaliperi', 'fren-balata': 'Fren Balatası',
+    'fren-kampana': 'Fren Kampanası', 'tekerlek-silindiri': 'Teker Silindiri',
+    'abs-modulu': 'ABS Modülü', 'el-freni': 'El Freni'
+  };
+  var services = Array.from(seciliServisler).map(function(s) {
+    if (s.startsWith('periodik:')) {
+      var altId = s.replace('periodik:', '');
+      var notEl = document.getElementById('not-' + altId);
+      var not = notEl ? notEl.value.trim() : '';
+      return 'Periyodik Bakım - ' + (adMapPeriodik[altId] || altId) + (not ? ' (' + not + ')' : '');
+    }
+    if (s.startsWith('ontakim:')) {
+      var altId = s.replace('ontakim:', '');
+      var notEl = document.getElementById('not-' + altId);
+      var not = notEl ? notEl.value.trim() : '';
+      return 'Ön Takım - ' + (adMapOnTakim[altId] || altId) + (not ? ' (' + not + ')' : '');
+    }
+    if (s.startsWith('fren:')) {
+      var altId = s.replace('fren:', '');
+      var notEl = document.getElementById('not-' + altId);
+      var not = notEl ? notEl.value.trim() : '';
+      return 'Fren Servisi - ' + (adMapFren[altId] || altId) + (not ? ' (' + not + ')' : '');
+    }
+    return s;
+  }).filter(function(s) { return s !== 'Periyodik Bakım' && s !== 'Ön Takım' && s !== 'Fren Servisi'; });
   var timestamp = new Date().toLocaleString('tr-TR');
 
   // Düzenleme mi yoksa yeni kayıt mı?
@@ -2365,6 +2695,21 @@ function resetForm() {
   });
   seciliServisler.clear();
   document.querySelectorAll('.service-item').forEach(function(el) { el.classList.remove('checked'); });
+  // Alt panelleri kapat ve sıfırla
+  var altPanel = document.getElementById('periodik-alt-panel');
+  if (altPanel) altPanel.classList.remove('acik');
+  var perokBtn = document.getElementById('periodik-ok');
+  if (perokBtn) perokBtn.style.transform = '';
+  var otPanel = document.getElementById('ontakim-alt-panel');
+  if (otPanel) otPanel.classList.remove('acik');
+  var otokBtn = document.getElementById('ontakim-ok');
+  if (otokBtn) otokBtn.style.transform = '';
+  var frenPanel = document.getElementById('fren-alt-panel');
+  if (frenPanel) frenPanel.classList.remove('acik');
+  var frenokBtn = document.getElementById('fren-ok');
+  if (frenokBtn) frenokBtn.style.transform = '';
+  document.querySelectorAll('.periodik-alt-check').forEach(function(c) { c.classList.remove('secili'); });
+  document.querySelectorAll('.periodik-alt-not').forEach(function(n) { n.value = ''; });
   document.querySelectorAll('.urgency-btn').forEach(function(b) { b.classList.remove('selected'); });
   var lowBtn = document.querySelector('.urgency-btn.low');
   if (lowBtn) lowBtn.classList.add('selected');
