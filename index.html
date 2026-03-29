@@ -1511,126 +1511,63 @@ function mobAramaYap(v) { mobListeYenile(v); }
 /* ── PNG indir ── */
 function mobDownloadQR() {
   if (!mobAktifKayit) { showNotif('UYARI','Önce bir araç seçin.',true); return; }
-
-  // ── Boyut & Renk Seçim Modalı (mobil) ──
-  var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);';
-  overlay.innerHTML = `
-    <div style="background:#12151a;border:1px solid #2e3445;border-radius:16px 16px 0 0;padding:24px 20px 32px;width:100%;max-width:480px;font-family:'IBM Plex Mono',monospace;animation:slideUp .25s ease;">
-      <div style="width:36px;height:4px;background:#2e3445;border-radius:2px;margin:0 auto 20px;"></div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;letter-spacing:3px;color:#e8ff47;margin-bottom:16px;text-transform:uppercase;">PNG İndir</div>
-
-      <div style="font-size:10px;letter-spacing:2px;color:#c8cfe0;text-transform:uppercase;margin-bottom:8px;">Boyut</div>
-      <div style="display:flex;gap:8px;margin-bottom:16px;" id="mob-dl-boyut-grup">
-        ${[['Küçük','300'],['Orta','500'],['Büyük','800'],['XL','1200']].map(([lbl,val]) =>
-          `<button onclick="mobDlBoyutSec(this,'${val}')" style="flex:1;padding:10px 4px;background:#1a1e26;border:1px solid #2e3445;color:#c8cfe0;font-family:'IBM Plex Mono',monospace;font-size:10px;border-radius:6px;cursor:pointer;transition:all .2s;letter-spacing:.5px;">${lbl}<br><span style="font-size:9px;color:#8892aa;">${val}px</span></button>`
-        ).join('')}
-      </div>
-
-      <div style="font-size:10px;letter-spacing:2px;color:#c8cfe0;text-transform:uppercase;margin-bottom:8px;">Arka Plan</div>
-      <div style="display:flex;gap:8px;margin-bottom:16px;" id="mob-dl-bg-grup">
-        ${[['Koyu','#0a0c0f'],['Beyaz','#ffffff'],['Gri','#1a1e26'],['Şeffaf','transparent']].map(([lbl,val]) =>
-          `<button onclick="mobDlBgSec(this,'${val}')" style="flex:1;padding:10px 4px;background:${val==='transparent'?'repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0/8px 8px':val};border:1px solid #2e3445;color:${val==='#ffffff'||val==='transparent'?'#000':'#fff'};font-family:'IBM Plex Mono',monospace;font-size:9px;border-radius:6px;cursor:pointer;transition:all .2s;letter-spacing:.5px;">${lbl}</button>`
-        ).join('')}
-      </div>
-
-      <div style="font-size:10px;letter-spacing:2px;color:#c8cfe0;text-transform:uppercase;margin-bottom:8px;">QR Rengi</div>
-      <div style="display:flex;gap:8px;margin-bottom:22px;" id="mob-dl-qr-grup">
-        ${[['Siyah','#000000'],['Sarı','#e8ff47'],['Beyaz','#ffffff'],['Turuncu','#ff6b35']].map(([lbl,val]) =>
-          `<button onclick="mobDlQrSec(this,'${val}')" style="flex:1;padding:10px 4px;background:${val};border:1px solid #2e3445;color:${val==='#000000'?'#fff':'#000'};font-family:'IBM Plex Mono',monospace;font-size:9px;border-radius:6px;cursor:pointer;transition:all .2s;letter-spacing:.5px;">${lbl}</button>`
-        ).join('')}
-      </div>
-
-      <div style="display:flex;gap:10px;">
-        <button onclick="this.closest('div[style*=\"z-index:9999\"]').remove()" style="flex:1;padding:14px;background:transparent;border:1px solid #2e3445;color:#8892aa;font-family:'IBM Plex Mono',monospace;font-size:11px;border-radius:8px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;">İptal</button>
-        <button onclick="mobDownloadQRExecute()" style="flex:2;padding:14px;background:#e8ff47;border:none;color:#0a0c0f;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;border-radius:8px;cursor:pointer;letter-spacing:2px;text-transform:uppercase;">İNDİR</button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-
-  // Varsayılan seçimler
-  window._mobDlAyar = { boyut: 500, bg: '#0a0c0f', qrRenk: '#000000' };
-  var szBtns = overlay.querySelectorAll('#mob-dl-boyut-grup button');
-  var bgBtns = overlay.querySelectorAll('#mob-dl-bg-grup button');
-  var qrBtns = overlay.querySelectorAll('#mob-dl-qr-grup button');
-  szBtns[1].style.borderColor = '#e8ff47'; szBtns[1].style.color = '#e8ff47';
-  bgBtns[0].style.borderColor = '#e8ff47';
-  qrBtns[0].style.borderColor = '#e8ff47';
-}
-
-window.mobDlBoyutSec = function(btn, val) {
-  window._mobDlAyar.boyut = parseInt(val);
-  btn.closest('#mob-dl-boyut-grup').querySelectorAll('button').forEach(function(b){ b.style.borderColor='#2e3445'; b.style.color='#c8cfe0'; });
-  btn.style.borderColor='#e8ff47'; btn.style.color='#e8ff47';
-};
-window.mobDlBgSec = function(btn, val) {
-  window._mobDlAyar.bg = val;
-  btn.closest('#mob-dl-bg-grup').querySelectorAll('button').forEach(function(b){ b.style.borderColor='#2e3445'; });
-  btn.style.borderColor='#e8ff47';
-};
-window.mobDlQrSec = function(btn, val) {
-  window._mobDlAyar.qrRenk = val;
-  btn.closest('#mob-dl-qr-grup').querySelectorAll('button').forEach(function(b){ b.style.borderColor='#2e3445'; });
-  btn.style.borderColor='#e8ff47';
-};
-
-window.mobDownloadQRExecute = function() {
-  if (!mobAktifKayit) return;
   var qrDiv  = document.getElementById('mob-qrcode-div');
   var canvas = qrDiv ? qrDiv.querySelector('canvas') : null;
   var img    = qrDiv ? qrDiv.querySelector('img')    : null;
   var src    = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
   if (!src) { showNotif('HATA','QR henüz hazır değil.',true); return; }
 
-  // Modalı kapat
-  var modal = document.querySelector('div[style*="z-index:9999"]');
-  if (modal) modal.remove();
+  var qrSize = 500;
+  var pad    = 32;
+  var servisAdi = mevcutServisAdi || 'AutoQR Servis';
+  var servisFontSize = 22;
+  var plakaFontSize  = 36;
+  var autoqrFontSize = 16;
+  var satirYukseklik = servisFontSize + 16 + plakaFontSize + 14 + autoqrFontSize + 20;
 
-  var ayar   = window._mobDlAyar || { boyut: 500, bg: '#0a0c0f', qrRenk: '#000000' };
-  var sz     = ayar.boyut;
-  var pad    = Math.round(sz * 0.06);
-  var textH  = Math.round(sz * 0.18);
-  var c = document.createElement('canvas');
-  c.width = sz + pad*2; c.height = sz + pad*2 + textH;
+  var c   = document.createElement('canvas');
+  c.width = qrSize + pad * 2;
+  c.height = pad + servisFontSize + 16 + qrSize + 16 + plakaFontSize + 14 + autoqrFontSize + pad;
   var ctx = c.getContext('2d');
 
-  if (ayar.bg === 'transparent') { ctx.clearRect(0, 0, c.width, c.height); }
-  else { ctx.fillStyle = ayar.bg; ctx.fillRect(0,0,c.width,c.height); }
+  // Beyaz arka plan
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, c.width, c.height);
 
-  var tempC = document.createElement('canvas');
-  tempC.width = sz; tempC.height = sz;
-  var tCtx = tempC.getContext('2d');
   var qi = new Image();
   qi.onload = function() {
-    tCtx.drawImage(qi, 0, 0, sz, sz);
-    if (ayar.qrRenk !== '#000000') {
-      var imgData = tCtx.getImageData(0, 0, sz, sz);
-      var d = imgData.data;
-      var r2 = parseInt(ayar.qrRenk.slice(1,3),16);
-      var g2 = parseInt(ayar.qrRenk.slice(3,5),16);
-      var b2 = parseInt(ayar.qrRenk.slice(5,7),16);
-      for (var i = 0; i < d.length; i += 4) {
-        if (d[i] < 128 && d[i+3] > 128) { d[i]=r2; d[i+1]=g2; d[i+2]=b2; }
-        else if (d[i] > 128 && d[i+3] > 128) { d[i]=255; d[i+1]=255; d[i+2]=255; }
-      }
-      tCtx.putImageData(imgData, 0, 0);
-    }
-    ctx.drawImage(tempC, pad, pad, sz, sz);
-    ctx.fillStyle = ayar.bg === '#ffffff' ? '#111' : '#e8ff47';
-    ctx.font = 'bold ' + Math.round(sz*0.09) + 'px monospace';
+    var y = pad;
+
+    // Servis adı (siyah, üstte)
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold ' + servisFontSize + 'px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(mobAktifKayit.plate, c.width/2, sz+pad+Math.round(textH*0.62));
-    ctx.fillStyle = ayar.bg === '#ffffff' ? '#aaa' : '#3d4455';
-    ctx.font = Math.round(sz*0.035) + 'px monospace';
-    ctx.fillText('AutoQR', c.width/2, sz+pad+Math.round(textH*0.9));
+    ctx.fillText(servisAdi, c.width / 2, y + servisFontSize);
+    y += servisFontSize + 16;
+
+    // QR kodu (siyah, beyaz arka planlı — orijinal zaten öyle)
+    ctx.drawImage(qi, pad, y, qrSize, qrSize);
+    y += qrSize + 16;
+
+    // Plaka (siyah)
+    ctx.fillStyle = '#000000';
+    ctx.font = 'bold ' + plakaFontSize + 'px monospace';
+    ctx.fillText(mobAktifKayit.plate, c.width / 2, y + plakaFontSize);
+    y += plakaFontSize + 14;
+
+    // AutoQR (sarı)
+    ctx.fillStyle = '#e8ff47';
+    ctx.font = 'bold ' + autoqrFontSize + 'px monospace';
+    ctx.fillText('AutoQR', c.width / 2, y + autoqrFontSize);
+
     var a = document.createElement('a');
-    a.download = mobAktifKayit.plate.replace(/\s+/g,'_') + '_QR_' + sz + 'px.png';
+    a.download = mobAktifKayit.plate.replace(/\s+/g,'_') + '_QR.png';
     a.href = c.toDataURL('image/png');
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    showNotif('İNDİRİLDİ', mobAktifKayit.plate + ' — ' + sz + 'px');
+    showNotif('İNDİRİLDİ', mobAktifKayit.plate + ' QR kaydedildi.');
   };
   qi.src = src;
-};
+}
 function mobilDownloadQR() { mobDownloadQR(); }
 
 /* ── Yazdır ── */
@@ -2862,74 +2799,6 @@ function printQR() {
 
 function downloadQR() {
   if (!aktifQR) { showNotif('HATA', 'Önce kayıt oluşturun.', true); return; }
-
-  // ── Boyut & Renk Seçim Modalı ──
-  var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
-  overlay.innerHTML = `
-    <div style="background:#12151a;border:1px solid #2e3445;border-radius:8px;padding:28px 32px;width:320px;font-family:'IBM Plex Mono',monospace;animation:fadeIn .2s ease;">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:900;letter-spacing:3px;color:#e8ff47;margin-bottom:4px;text-transform:uppercase;">PNG İndir</div>
-      <div style="font-size:10px;color:#8892aa;letter-spacing:1px;margin-bottom:20px;">Boyut ve renk seçin</div>
-
-      <div style="font-size:10px;letter-spacing:2px;color:#c8cfe0;text-transform:uppercase;margin-bottom:8px;">Boyut</div>
-      <div style="display:flex;gap:8px;margin-bottom:18px;" id="dl-boyut-grup">
-        ${[['Küçük','300'],['Orta','500'],['Büyük','800'],['XL','1200']].map(([lbl,val]) =>
-          `<button onclick="dlBoyutSec(this,'${val}')" style="flex:1;padding:8px 4px;background:#1a1e26;border:1px solid #2e3445;color:#c8cfe0;font-family:'IBM Plex Mono',monospace;font-size:10px;border-radius:4px;cursor:pointer;transition:all .2s;letter-spacing:1px;">${lbl}<br><span style="font-size:9px;color:#8892aa;">${val}px</span></button>`
-        ).join('')}
-      </div>
-
-      <div style="font-size:10px;letter-spacing:2px;color:#c8cfe0;text-transform:uppercase;margin-bottom:8px;">Arka Plan Rengi</div>
-      <div style="display:flex;gap:8px;margin-bottom:18px;" id="dl-bg-grup">
-        ${[['Koyu','#0a0c0f'],['Beyaz','#ffffff'],['Gri','#1a1e26'],['Şeffaf','transparent']].map(([lbl,val]) =>
-          `<button onclick="dlBgSec(this,'${val}')" style="flex:1;padding:8px 4px;background:${val==='transparent'?'repeating-conic-gradient(#555 0% 25%,#333 0% 50%) 0/8px 8px':val};border:1px solid #2e3445;color:${val==='#ffffff'||val==='transparent'?'#000':'#fff'};font-family:'IBM Plex Mono',monospace;font-size:9px;border-radius:4px;cursor:pointer;transition:all .2s;letter-spacing:.5px;">${lbl}</button>`
-        ).join('')}
-      </div>
-
-      <div style="font-size:10px;letter-spacing:2px;color:#c8cfe0;text-transform:uppercase;margin-bottom:8px;">QR Rengi</div>
-      <div style="display:flex;gap:8px;margin-bottom:20px;" id="dl-qr-grup">
-        ${[['Siyah','#000000'],['Sarı','#e8ff47'],['Beyaz','#ffffff'],['Turuncu','#ff6b35']].map(([lbl,val]) =>
-          `<button onclick="dlQrSec(this,'${val}')" style="flex:1;padding:8px 4px;background:${val};border:1px solid #2e3445;color:${val==='#000000'?'#fff':val==='#ffffff'?'#000':'#000'};font-family:'IBM Plex Mono',monospace;font-size:9px;border-radius:4px;cursor:pointer;transition:all .2s;letter-spacing:.5px;">${lbl}</button>`
-        ).join('')}
-      </div>
-
-      <div style="display:flex;gap:10px;">
-        <button onclick="this.closest('div[style]').remove()" style="flex:1;padding:10px;background:transparent;border:1px solid #2e3445;color:#8892aa;font-family:'IBM Plex Mono',monospace;font-size:11px;border-radius:4px;cursor:pointer;letter-spacing:1px;text-transform:uppercase;">İptal</button>
-        <button onclick="downloadQRExecute()" style="flex:2;padding:10px;background:#e8ff47;border:none;color:#0a0c0f;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;border-radius:4px;cursor:pointer;letter-spacing:2px;text-transform:uppercase;">İNDİR</button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-
-  // Varsayılan seçimler
-  window._dlAyar = { boyut: 500, bg: '#0a0c0f', qrRenk: '#000000' };
-  var bgBtns  = overlay.querySelectorAll('#dl-bg-grup button');
-  var qrBtns  = overlay.querySelectorAll('#dl-qr-grup button');
-  var szBtns  = overlay.querySelectorAll('#dl-boyut-grup button');
-  // Orta boyut aktif
-  szBtns[1].style.borderColor = '#e8ff47'; szBtns[1].style.color = '#e8ff47';
-  // Koyu bg aktif
-  bgBtns[0].style.borderColor = '#e8ff47';
-  // Siyah QR aktif
-  qrBtns[0].style.borderColor = '#e8ff47';
-}
-
-window.dlBoyutSec = function(btn, val) {
-  window._dlAyar.boyut = parseInt(val);
-  btn.closest('#dl-boyut-grup').querySelectorAll('button').forEach(function(b){ b.style.borderColor='#2e3445'; b.style.color='#c8cfe0'; });
-  btn.style.borderColor = '#e8ff47'; btn.style.color = '#e8ff47';
-};
-window.dlBgSec = function(btn, val) {
-  window._dlAyar.bg = val;
-  btn.closest('#dl-bg-grup').querySelectorAll('button').forEach(function(b){ b.style.borderColor='#2e3445'; });
-  btn.style.borderColor = '#e8ff47';
-};
-window.dlQrSec = function(btn, val) {
-  window._dlAyar.qrRenk = val;
-  btn.closest('#dl-qr-grup').querySelectorAll('button').forEach(function(b){ b.style.borderColor='#2e3445'; });
-  btn.style.borderColor = '#e8ff47';
-};
-
-window.downloadQRExecute = function() {
-  if (!aktifQR) return;
   var container = document.getElementById('qrcode');
   var qrCanvas  = container.querySelector('canvas');
   var qrImg     = container.querySelector('img');
@@ -2938,71 +2807,58 @@ window.downloadQRExecute = function() {
   else if (qrImg && qrImg.src) { qrDataURL = qrImg.src; }
   else { showNotif('HATA', 'QR görseli henüz hazır değil.', true); return; }
 
-  // Modalı kapat
-  var modal = document.querySelector('div[style*="z-index:9999"]');
-  if (modal) modal.remove();
+  var qrSize        = 500;
+  var pad           = 32;
+  var servisAdi     = mevcutServisAdi || 'AutoQR Servis';
+  var servisFontSize = 22;
+  var plakaFontSize  = 36;
+  var autoqrFontSize = 16;
 
-  var ayar   = window._dlAyar || { boyut: 500, bg: '#0a0c0f', qrRenk: '#000000' };
-  var qrSize = ayar.boyut;
-  var padding = Math.round(qrSize * 0.06);
-  var textH   = Math.round(qrSize * 0.18);
   var c = document.createElement('canvas');
-  c.width  = qrSize + padding * 2;
-  c.height = qrSize + padding * 2 + textH;
-  var ctx = c.getContext('2d');
+  c.width  = qrSize + pad * 2;
+  c.height = pad + servisFontSize + 16 + qrSize + 16 + plakaFontSize + 14 + autoqrFontSize + pad;
+  var ctx  = c.getContext('2d');
 
-  // Arka plan
-  if (ayar.bg === 'transparent') {
-    ctx.clearRect(0, 0, c.width, c.height);
-  } else {
-    ctx.fillStyle = ayar.bg;
-    ctx.fillRect(0, 0, c.width, c.height);
-  }
+  // Beyaz arka plan
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, c.width, c.height);
 
-  // QR kodu yeniden renklendir
-  var tempC = document.createElement('canvas');
-  tempC.width = qrSize; tempC.height = qrSize;
-  var tCtx = tempC.getContext('2d');
-  var qrTmp = new Image();
-  qrTmp.onload = function() {
-    tCtx.drawImage(qrTmp, 0, 0, qrSize, qrSize);
-    // QR rengini değiştir: siyah pikselleri seçilen renge boya
-    if (ayar.qrRenk !== '#000000') {
-      var imgData = tCtx.getImageData(0, 0, qrSize, qrSize);
-      var d = imgData.data;
-      var r2 = parseInt(ayar.qrRenk.slice(1,3),16);
-      var g2 = parseInt(ayar.qrRenk.slice(3,5),16);
-      var b2 = parseInt(ayar.qrRenk.slice(5,7),16);
-      for (var i = 0; i < d.length; i += 4) {
-        if (d[i] < 128 && d[i+3] > 128) { d[i]=r2; d[i+1]=g2; d[i+2]=b2; }
-        else if (d[i] > 128 && d[i+3] > 128) { d[i]=255; d[i+1]=255; d[i+2]=255; }
-      }
-      tCtx.putImageData(imgData, 0, 0);
-    }
-    ctx.drawImage(tempC, padding, padding, qrSize, qrSize);
+  var qrImage = new Image();
+  qrImage.onload = function() {
+    var y = pad;
 
-    // Plaka yazısı
-    var plakaFontSize = Math.round(qrSize * 0.09);
-    ctx.fillStyle = ayar.bg === '#ffffff' ? '#111111' : '#e8ff47';
-    ctx.font = 'bold ' + plakaFontSize + 'px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText(aktifQR.plate, c.width / 2, qrSize + padding + Math.round(textH * 0.62));
+    // Servis adı — siyah, üstte
+    ctx.fillStyle  = '#000000';
+    ctx.font       = 'bold ' + servisFontSize + 'px monospace';
+    ctx.textAlign  = 'center';
+    ctx.fillText(servisAdi, c.width / 2, y + servisFontSize);
+    y += servisFontSize + 16;
 
-    // AutoQR logo
-    ctx.fillStyle = ayar.bg === '#ffffff' ? '#aaaaaa' : '#3d4455';
-    ctx.font = Math.round(qrSize * 0.035) + 'px monospace';
-    ctx.fillText('AutoQR', c.width / 2, qrSize + padding + Math.round(textH * 0.9));
+    // QR kodu — siyah modüller
+    ctx.drawImage(qrImage, pad, y, qrSize, qrSize);
+    y += qrSize + 16;
+
+    // Plaka — siyah
+    ctx.fillStyle = '#000000';
+    ctx.font      = 'bold ' + plakaFontSize + 'px monospace';
+    ctx.fillText(aktifQR.plate, c.width / 2, y + plakaFontSize);
+    y += plakaFontSize + 14;
+
+    // AutoQR — sarı
+    ctx.fillStyle = '#e8ff47';
+    ctx.font      = 'bold ' + autoqrFontSize + 'px monospace';
+    ctx.fillText('AutoQR', c.width / 2, y + autoqrFontSize);
 
     var link = document.createElement('a');
-    link.download = aktifQR.plate.replace(/\s+/g, '_') + '_QR_' + qrSize + 'px.png';
+    link.download = aktifQR.plate.replace(/\s+/g, '_') + '_QR.png';
     link.href = c.toDataURL('image/png');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showNotif('İNDİRİLDİ', aktifQR.plate + ' — ' + qrSize + 'px QR kaydedildi.');
+    showNotif('İNDİRİLDİ', aktifQR.plate + ' QR kaydedildi.');
   };
-  qrTmp.src = qrDataURL;
-};
+  qrImage.src = qrDataURL;
+}
 
 function copyRegistrationLink() {
   if (!aktifQR) return;
