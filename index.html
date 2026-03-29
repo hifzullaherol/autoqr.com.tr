@@ -1517,54 +1517,74 @@ function mobDownloadQR() {
   var src    = canvas ? canvas.toDataURL('image/png') : (img ? img.src : null);
   if (!src) { showNotif('HATA','QR henüz hazır değil.',true); return; }
 
-  var qrSize = 500;
-  var pad    = 32;
+  // Niimbot B1 — dikey: 30×50mm @ 203 DPI → 240×400px (×2 = 480×800px)
+  var DPI    = 2;
+  var W      = 240 * DPI; // 480px — etiket genişliği
+  var H      = 400 * DPI; // 800px — etiket yüksekliği
+  var pad    = 7  * DPI;
   var servisAdi = mevcutServisAdi || 'AutoQR Servis';
-  var servisFontSize = 22;
-  var plakaFontSize  = 36;
-  var autoqrFontSize = 16;
-  var satirYukseklik = servisFontSize + 16 + plakaFontSize + 14 + autoqrFontSize + 20;
+
+  // QR karesi: genişliğe tam sığsın
+  var qrSize = W - pad * 2;
 
   var c   = document.createElement('canvas');
-  c.width = qrSize + pad * 2;
-  c.height = pad + servisFontSize + 16 + qrSize + 16 + plakaFontSize + 14 + autoqrFontSize + pad;
+  c.width = W; c.height = H;
   var ctx = c.getContext('2d');
 
   // Beyaz arka plan
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillRect(0, 0, W, H);
 
   var qi = new Image();
   qi.onload = function() {
-    var y = pad;
-
-    // Servis adı (siyah, üstte)
-    ctx.fillStyle = '#000000';
-    ctx.font = 'bold ' + servisFontSize + 'px monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(servisAdi, c.width / 2, y + servisFontSize);
-    y += servisFontSize + 16;
+    var cx = W / 2;
+    var y  = pad;
 
-    // QR kodu (siyah, beyaz arka planlı — orijinal zaten öyle)
-    ctx.drawImage(qi, pad, y, qrSize, qrSize);
-    y += qrSize + 16;
-
-    // Plaka (siyah)
+    // Servis adı — siyah, üstte
+    var sfSize = 13 * DPI;
+    ctx.font = 'bold ' + sfSize + 'px monospace';
+    // Uzunsa küçült
+    while (ctx.measureText(servisAdi).width > W - pad * 2 && sfSize > 8 * DPI) {
+      sfSize -= 1;
+      ctx.font = 'bold ' + sfSize + 'px monospace';
+    }
+    var sadiGoster = servisAdi;
+    ctx.font = 'bold ' + sfSize + 'px monospace';
+    while (ctx.measureText(sadiGoster).width > W - pad * 2 && sadiGoster.length > 3) {
+      sadiGoster = sadiGoster.slice(0, -1);
+    }
+    if (sadiGoster !== servisAdi) sadiGoster = sadiGoster.trim() + '…';
     ctx.fillStyle = '#000000';
-    ctx.font = 'bold ' + plakaFontSize + 'px monospace';
-    ctx.fillText(mobAktifKayit.plate, c.width / 2, y + plakaFontSize);
-    y += plakaFontSize + 14;
+    ctx.fillText(sadiGoster, cx, y + sfSize);
+    y += sfSize + 8 * DPI;
 
-    // AutoQR (sarı)
+    // QR kodu — siyah
+    ctx.drawImage(qi, pad, y, qrSize, qrSize);
+    y += qrSize + 8 * DPI;
+
+    // Plaka — siyah, büyük
+    var plFont = 26 * DPI;
+    ctx.font = 'bold ' + plFont + 'px monospace';
+    while (ctx.measureText(mobAktifKayit.plate).width > W - pad * 2 && plFont > 14 * DPI) {
+      plFont -= DPI;
+      ctx.font = 'bold ' + plFont + 'px monospace';
+    }
+    ctx.fillStyle = '#000000';
+    ctx.fillText(mobAktifKayit.plate, cx, y + plFont);
+    y += plFont + 7 * DPI;
+
+    // AutoQR — sarı
+    var aqSize = 11 * DPI;
+    ctx.font = 'bold ' + aqSize + 'px monospace';
     ctx.fillStyle = '#e8ff47';
-    ctx.font = 'bold ' + autoqrFontSize + 'px monospace';
-    ctx.fillText('AutoQR', c.width / 2, y + autoqrFontSize);
+    ctx.fillText('AutoQR', cx, y + aqSize);
 
     var a = document.createElement('a');
-    a.download = mobAktifKayit.plate.replace(/\s+/g,'_') + '_QR.png';
+    a.download = mobAktifKayit.plate.replace(/\s+/g,'_') + '_QR_niimbot.png';
     a.href = c.toDataURL('image/png');
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    showNotif('İNDİRİLDİ', mobAktifKayit.plate + ' QR kaydedildi.');
+    showNotif('İNDİRİLDİ', mobAktifKayit.plate + ' — Niimbot 30×50mm');
   };
   qi.src = src;
 }
@@ -2807,55 +2827,72 @@ function downloadQR() {
   else if (qrImg && qrImg.src) { qrDataURL = qrImg.src; }
   else { showNotif('HATA', 'QR görseli henüz hazır değil.', true); return; }
 
-  var qrSize        = 500;
-  var pad           = 32;
-  var servisAdi     = mevcutServisAdi || 'AutoQR Servis';
-  var servisFontSize = 22;
-  var plakaFontSize  = 36;
-  var autoqrFontSize = 16;
+  // Niimbot B1 — dikey: 30×50mm @ 203 DPI → 240×400px (×2 = 480×800px)
+  var DPI    = 2;
+  var W      = 240 * DPI;
+  var H      = 400 * DPI;
+  var pad    = 7  * DPI;
+  var qrSize = W - pad * 2;
+  var servisAdi = mevcutServisAdi || 'AutoQR Servis';
 
   var c = document.createElement('canvas');
-  c.width  = qrSize + pad * 2;
-  c.height = pad + servisFontSize + 16 + qrSize + 16 + plakaFontSize + 14 + autoqrFontSize + pad;
-  var ctx  = c.getContext('2d');
+  c.width = W; c.height = H;
+  var ctx = c.getContext('2d');
 
   // Beyaz arka plan
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillRect(0, 0, W, H);
 
   var qrImage = new Image();
   qrImage.onload = function() {
-    var y = pad;
+    ctx.textAlign = 'center';
+    var cx = W / 2;
+    var y  = pad;
 
     // Servis adı — siyah, üstte
-    ctx.fillStyle  = '#000000';
-    ctx.font       = 'bold ' + servisFontSize + 'px monospace';
-    ctx.textAlign  = 'center';
-    ctx.fillText(servisAdi, c.width / 2, y + servisFontSize);
-    y += servisFontSize + 16;
-
-    // QR kodu — siyah modüller
-    ctx.drawImage(qrImage, pad, y, qrSize, qrSize);
-    y += qrSize + 16;
-
-    // Plaka — siyah
+    var sfSize = 13 * DPI;
+    ctx.font = 'bold ' + sfSize + 'px monospace';
+    while (ctx.measureText(servisAdi).width > W - pad * 2 && sfSize > 8 * DPI) {
+      sfSize -= 1;
+      ctx.font = 'bold ' + sfSize + 'px monospace';
+    }
+    var sadiGoster = servisAdi;
+    while (ctx.measureText(sadiGoster).width > W - pad * 2 && sadiGoster.length > 3) {
+      sadiGoster = sadiGoster.slice(0, -1);
+    }
+    if (sadiGoster !== servisAdi) sadiGoster = sadiGoster.trim() + '…';
     ctx.fillStyle = '#000000';
-    ctx.font      = 'bold ' + plakaFontSize + 'px monospace';
-    ctx.fillText(aktifQR.plate, c.width / 2, y + plakaFontSize);
-    y += plakaFontSize + 14;
+    ctx.fillText(sadiGoster, cx, y + sfSize);
+    y += sfSize + 8 * DPI;
+
+    // QR kodu — siyah
+    ctx.drawImage(qrImage, pad, y, qrSize, qrSize);
+    y += qrSize + 8 * DPI;
+
+    // Plaka — siyah, büyük
+    var plFont = 26 * DPI;
+    ctx.font = 'bold ' + plFont + 'px monospace';
+    while (ctx.measureText(aktifQR.plate).width > W - pad * 2 && plFont > 14 * DPI) {
+      plFont -= DPI;
+      ctx.font = 'bold ' + plFont + 'px monospace';
+    }
+    ctx.fillStyle = '#000000';
+    ctx.fillText(aktifQR.plate, cx, y + plFont);
+    y += plFont + 7 * DPI;
 
     // AutoQR — sarı
+    var aqSize = 11 * DPI;
+    ctx.font = 'bold ' + aqSize + 'px monospace';
     ctx.fillStyle = '#e8ff47';
-    ctx.font      = 'bold ' + autoqrFontSize + 'px monospace';
-    ctx.fillText('AutoQR', c.width / 2, y + autoqrFontSize);
+    ctx.fillText('AutoQR', cx, y + aqSize);
 
     var link = document.createElement('a');
-    link.download = aktifQR.plate.replace(/\s+/g, '_') + '_QR.png';
+    link.download = aktifQR.plate.replace(/\s+/g, '_') + '_QR_niimbot.png';
     link.href = c.toDataURL('image/png');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showNotif('İNDİRİLDİ', aktifQR.plate + ' QR kaydedildi.');
+    showNotif('İNDİRİLDİ', aktifQR.plate + ' — Niimbot 30×50mm');
   };
   qrImage.src = qrDataURL;
 }
